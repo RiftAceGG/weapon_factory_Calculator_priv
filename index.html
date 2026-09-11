@@ -656,15 +656,26 @@
   .th-hint{ margin:8px 0 0; font-family:'JetBrains Mono', monospace; font-size:0.66rem; line-height:1.6; color:var(--ink-dim); }
 
   .th-sides{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .th-sides .th-span{ grid-column:1 / -1; }
   .th-side{ border:2px solid var(--ink); background:var(--bg); padding:12px; }
   .th-lines{ display:grid; gap:8px; margin-bottom:10px; }
-  .th-line{ display:grid; grid-template-columns:1fr 74px auto auto; gap:6px; align-items:center; }
+  /* Every control gets a named slot. The columns used to be positional, so a
+     line without a thumbnail slid the item box into the 44px art column and
+     gave the wide one to the quantity — which is what broke it on desktop. */
+  .th-line{
+    display:grid; gap:6px; align-items:center;
+    grid-template-columns:44px minmax(150px, 1fr) 78px auto 62px auto;
+    grid-template-areas:"art item qty tier lvl del";
+  }
+  .th-line .th-pick{ grid-area:item; }
+  .th-line .th-lvl{ grid-area:lvl; }
+  .th-line .th-del{ grid-area:del; }
   .th-line select, .th-line input{
     min-height:42px; padding:7px 8px; border:2px solid var(--ink); background:var(--panel); color:var(--ink);
     font-family:'Barlow', sans-serif; font-size:0.92rem; min-width:0; width:100%;
   }
-  .th-line .th-qty{ font-family:'JetBrains Mono', monospace; text-align:center; }
-  .th-line .th-tier{ width:auto; min-width:74px; font-family:'JetBrains Mono', monospace; font-size:0.8rem; }
+  .th-line .th-qty{ grid-area:qty; font-family:'JetBrains Mono', monospace; text-align:center; }
+  .th-line .th-tier{ grid-area:tier; width:100%; min-width:70px; font-family:'JetBrains Mono', monospace; font-size:0.8rem; }
   .th-del{
     min-height:42px; min-width:38px; border:2px solid var(--ink); background:var(--panel); color:var(--ink-dim);
     cursor:pointer; font-size:0.9rem; line-height:1;
@@ -707,12 +718,14 @@
     .th-sides{ grid-template-columns:1fr; }
   }
   @media (max-width:560px){
-    .th-line{ grid-template-columns:1fr 76px 58px auto; grid-template-areas:"item item item item" "qty tier lvl del"; }
+    .th-line{
+      grid-template-columns:38px 1fr 56px 50px auto;
+      grid-template-areas:"art item item item item" ". qty tier lvl del";
+    }
     .th-pick{ grid-area:item; }
     .th-lvl{ grid-area:lvl; width:100%; }
 
     .th-line .th-qty{ grid-area:qty; }
-    .th-line .th-tier{ grid-area:tier; width:100%; }
     .th-del{ grid-area:del; width:auto; min-width:44px; }
     .th-preview{ font-size:0.76rem; padding:11px; }
     .th-notice{ font-size:0.86rem; padding:11px 12px; }
@@ -770,7 +783,6 @@
   .th-thumb img{ width:100%; height:100%; object-fit:contain; display:block; }
   .th-thumb-none{ background:var(--panel-2); }
   .th-line .th-thumb{ grid-area:art; }
-  .th-lines .th-line{ grid-template-columns:44px 1fr 74px auto auto; }
 
   /* board posts, laid out rather than dumped as a text block */
   .th-post-grid{ display:grid; grid-template-columns:1fr auto 1fr; gap:10px; padding:12px; align-items:start; }
@@ -783,7 +795,6 @@
   .th-note{ padding:0 12px 10px; font-size:0.86rem; color:var(--ink-dim); }
   .th-post-actions{ display:flex; flex-wrap:wrap; gap:8px; padding:0 12px 12px; }
   @media (max-width:560px){
-    .th-lines .th-line{ grid-template-columns:38px 1fr 62px 52px auto; grid-template-areas:"art item item item item" ". qty tier lvl del"; }
     .th-post-grid{ grid-template-columns:1fr; gap:6px; }
     .th-swap{ justify-self:center; transform:rotate(90deg); }
   }
@@ -811,6 +822,44 @@
     content:attr(data-unread); margin-left:5px; padding:0 5px; border:2px solid var(--ink);
     background:var(--orange); color:#fff; font-family:'JetBrains Mono', monospace; font-size:0.58rem; vertical-align:2px;
   }
+
+  /* Trading, simplified: the board is the page, posting is one panel you open. */
+  .th-safety{
+    margin-top:16px; padding:12px 14px; border:2px solid var(--orange);
+    background:var(--tint-orange, #fff4ef); font-size:0.9rem; line-height:1.6;
+  }
+  .th-safety b{ color:var(--ink); }
+  .th-maker{ margin-top:16px; border:2px solid var(--ink); background:var(--panel); box-shadow:5px 5px 0 var(--ink); }
+  .th-maker > summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:10px;
+    padding:15px 16px; min-height:56px;
+    font-family:'Anton', sans-serif; text-transform:uppercase; letter-spacing:1px; font-size:1.05rem;
+  }
+  .th-maker > summary::-webkit-details-marker{ display:none; }
+  .th-maker > summary:hover{ background:var(--panel-2); }
+  .th-maker-plus{
+    display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+    border:2px solid var(--ink); background:var(--yellow); color:#17181c; font-size:1.1rem; line-height:1;
+  }
+  .th-maker[open] .th-maker-plus{ background:var(--ink); color:var(--yellow); }
+  .th-maker-body{ padding:0 16px 16px; }
+  .th-extra{ margin-top:14px; border-top:2px solid var(--line); }
+  .th-extra > summary{
+    cursor:pointer; padding:11px 0; min-height:44px; display:flex; align-items:center;
+    font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--ink-dim);
+  }
+  .th-extra > summary:hover{ color:var(--ink); }
+  .th-extra-body{ padding-bottom:6px; }
+  .th-hidden-label, .th-hidden-field{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  @media (max-width:560px){
+    .th-maker > summary{ font-size:0.95rem; padding:13px 12px; }
+    .th-maker-body{ padding:0 12px 12px; }
+    .th-safety{ font-size:0.85rem; }
+  }
+
+  .th-sug button{ gap:9px; }
+  .th-sug .th-sug-name{ flex:1 1 auto; min-width:0; }
+  .th-sug .th-thumb{ border-width:2px; }
 
   /* ---------- HORIZONTAL SECTION DECK ----------
      Sections sit side by side and snap one at a time; each slide scrolls
@@ -1194,37 +1243,32 @@
 
 <div class="slide" id="slideTrading" data-title="Trading">
 <section id="trading">
-  <div class="kicker">// Trading Hub</div>
-  <h2>Trading hub</h2>
-  <p class="lede">Build a clean trade post from real item and pet data, then take it wherever your community trades. Your Discord handle is included so people can reach you.</p>
+  <div class="kicker">// Trading</div>
+  <h2>Trading</h2>
+  <p class="lede">Swap items and pets with other players. Sign in, say what you have and what you want, and post it.</p>
 
-  <div class="th-notice" id="thNotice">
-    <b>How this works.</b> Sign in with Discord, build your offer, and press <b>Post to board</b> — everyone
-    visiting the site sees it, and your Discord handle goes with it so they can message you there. You can have
-    up to 10 offers up at once and delete your own any time. Press <b>Message</b> on someone's offer to talk to
-    them here — only the two of you can read it, and they get a badge on the Trading link when they next open the site. <b>Nothing here is private:</b> anything you post is
-    public, so never share passwords or personal details.
+  <div class="th-safety">
+    <b>Keep yourself safe.</b> Everything you post here is public. Never share your password, your address, your
+    school, or your age. Trades happen in game — nobody needs anything else from you.
   </div>
-
 
   <div class="craft-panel" style="margin-top:16px;">
     <div class="th-row" style="justify-content:space-between; align-items:center;">
-      <h3 class="th-h" style="margin:0;">Trade board <span class="th-opt" id="thBoardCount"></span></h3>
+      <h3 class="th-h" style="margin:0;">Offers <span class="th-opt" id="thBoardCount"></span></h3>
       <button type="button" class="btn-util sm" id="thRefresh">Refresh</button>
     </div>
-    <p class="th-hint" style="margin-bottom:12px;">Everyone's offers, newest first. New posts appear here on their own — no need to refresh.</p>
-    <div id="thBoard"></div>
+    <div id="thBoard" style="margin-top:10px;"></div>
   </div>
 
   <div class="craft-panel th-chat" id="thChat" style="margin-top:16px;" hidden>
     <div class="th-row" style="justify-content:space-between; align-items:center;">
       <h3 class="th-h" style="margin:0;">Messages <span class="th-unread" id="thUnread" hidden>0</span></h3>
       <div class="th-row">
-        <button type="button" class="btn-util sm" id="thNotifyBtn" hidden>Turn on notifications</button>
+        <button type="button" class="btn-util sm" id="thNotifyBtn" hidden>Notify me</button>
         <button type="button" class="btn-util sm" id="thChatClose">Close</button>
       </div>
     </div>
-    <p class="th-hint" style="margin-bottom:10px;">Talking to <b id="thChatWith">—</b> <span id="thChatAbout"></span>. Only the two of you can read this.</p>
+    <p class="th-hint" style="margin-bottom:10px;">You and <b id="thChatWith">—</b> only. <span id="thChatAbout"></span></p>
     <div class="th-chat-list" id="thChatList"></div>
     <div class="th-chat-send">
       <input type="text" id="thChatInput" placeholder="Write a message…" maxlength="800" autocomplete="off" aria-label="Message">
@@ -1232,93 +1276,65 @@
     </div>
   </div>
 
-  <div class="craft-panel" style="margin-top:16px;">
-    <h3 class="th-h">Your contact</h3>
-    <div id="thAccount" style="margin-bottom:14px;"></div>
-    <div class="th-row">
-      <div class="th-field" style="flex:2 1 220px;">
-        <label for="thDiscord">Discord username</label>
-        <input type="text" id="thDiscord" placeholder="yourname" maxlength="40" autocomplete="off">
-      </div>
-      <div class="th-field" style="flex:2 1 220px;">
-        <label for="thRoblox">Roblox username <span class="th-opt">optional</span></label>
-        <input type="text" id="thRoblox" placeholder="YourRobloxName" maxlength="40" autocomplete="off">
-      </div>
-    </div>
-    <p class="th-hint">Saved on this device only, and only ever written into posts you choose to copy or share. Never use your password or anything private here.</p>
-  </div>
+  <details class="th-maker" id="thMaker">
+    <summary><span class="th-maker-plus">+</span> Post an offer</summary>
+    <div class="th-maker-body">
+      <div id="thAccount"></div>
 
-  <div class="craft-panel" style="margin-top:16px;">
-    <div class="th-sides">
-      <div class="th-side" data-side="have">
-        <h3 class="th-h">You are offering</h3>
-        <div class="th-lines" id="thHaveLines"></div>
-        <button type="button" class="btn-util sm" data-add="have">+ Add item</button>
+      <div class="th-sides" style="margin-top:14px;">
+        <p class="th-hint th-span" style="margin:0 0 10px;">Items <b>and pets</b> both work — start typing a name, like <b>souls</b>, <b>hydra</b> or <b>cloud</b>.</p>
+        <div class="th-side" data-side="have">
+          <h3 class="th-h">I have</h3>
+          <div class="th-lines" id="thHaveLines"></div>
+          <button type="button" class="btn-util sm" data-add="have">+ Add another</button>
+        </div>
+        <div class="th-side" data-side="want">
+          <h3 class="th-h">I want</h3>
+          <div class="th-lines" id="thWantLines"></div>
+          <button type="button" class="btn-util sm" data-add="want">+ Add another</button>
+        </div>
       </div>
-      <div class="th-side" data-side="want">
-        <h3 class="th-h">You are looking for</h3>
-        <div class="th-lines" id="thWantLines"></div>
-        <button type="button" class="btn-util sm" data-add="want">+ Add item</button>
+
+      <div class="th-row" style="margin-top:14px;">
+        <div class="th-field" style="flex:3 1 240px;">
+          <label for="thNote">Anything to add? <span class="th-opt">optional</span></label>
+          <input type="text" id="thNote" placeholder="e.g. can add gems on top" maxlength="140">
+        </div>
       </div>
-    </div>
 
-    <div class="th-row" style="margin-top:16px;">
-      <div class="th-field" style="flex:1 1 160px;">
-        <label for="thKind">Trade type</label>
-        <select id="thKind">
-          <option value="Trade">Straight trade</option>
-          <option value="WTB">Want to buy</option>
-          <option value="WTS">Want to sell</option>
-          <option value="Giveaway">Giveaway</option>
-        </select>
+      <div class="th-row" style="margin-top:16px;">
+        <button type="button" class="btn-util primary" id="thPost">Post my offer</button>
+        <button type="button" class="btn-util" id="thReset">Clear</button>
       </div>
-      <div class="th-field" style="flex:3 1 260px;">
-        <label for="thNote">Note <span class="th-opt">optional</span></label>
-        <input type="text" id="thNote" placeholder="e.g. happy to add gems on top" maxlength="140">
-      </div>
-    </div>
 
-    <h3 class="th-h" style="margin-top:18px;">Your post</h3>
-    <pre class="th-preview" id="thPreview" aria-live="polite"></pre>
-    <div class="th-row" style="margin-top:12px;">
-      <button type="button" class="btn-util primary" id="thCopy">Copy post</button>
-      <button type="button" class="btn-util" id="thImage">Make image card</button>
-      <button type="button" class="btn-util primary" id="thPost">Post to board</button>
-      <button type="button" class="btn-util" id="thSave">Save draft on this device</button>
-      <button type="button" class="btn-util danger" id="thReset">Start over</button>
-    </div>
-  </div>
-
-  <div class="craft-panel" style="margin-top:16px;">
-    <div class="th-row" style="justify-content:space-between;">
-      <h3 class="th-h" style="margin:0;">My drafts (this device)</h3>
-      <span class="th-hint" id="thCount" style="margin:0;"></span>
-    </div>
-    <div id="thList" style="margin-top:12px;"></div>
-  </div>
-
-  <details class="th-server">
-    <summary>Connecting a server — what on-site chat and notifications need</summary>
-    <div class="th-server-body">
-      <p>Trade listings that other people can see, chat between two players, and notifications all need one thing this
-      site does not have: a server that stores messages and hands them to other browsers. A static page can't do it —
-      your browser has no way to reach anyone else's.</p>
-      <p><b>The quickest route</b> is to skip the server entirely: run the trading in your Discord, and let this page
-      build the posts. Discord already gives you accounts, DMs, notifications, moderation tools and a report button,
-      and people are there anyway.</p>
-      <p><b>If you do want it on the site</b>, the hub is written so listings can come from an API instead of this
-      device. Point it at your backend and the same UI reads from it:</p>
-      <pre class="th-code">TradingHub.configureRemote({
-  endpoint: 'https://your-server/api',
-  headers:  { 'Authorization': 'Bearer …' }
-});</pre>
-      <p>It expects <code>GET {endpoint}/listings</code> to return <code>{ listings: [ … ] }</code> in the same shape
-      as a saved listing here, and <code>POST {endpoint}/listings</code> to accept one. Anything beyond that — chat,
-      notifications, accounts — is server work, not page work.</p>
-      <p><b>Worth planning for before you open chat to strangers:</b> a lot of Roblox players are children. If people
-      can message each other on your site you become responsible for what gets said — you would want reporting,
-      blocking, a way to remove posts, and someone actually reading reports. That is the real reason most fan sites
-      hand messaging to Discord rather than building their own.</p>
+      <details class="th-extra">
+        <summary>More options</summary>
+        <div class="th-extra-body">
+          <div class="th-row">
+            <div class="th-field" style="flex:1 1 160px;">
+              <label for="thKind">Type of offer</label>
+              <select id="thKind">
+                <option value="Trade">Straight trade</option>
+                <option value="WTB">Want to buy</option>
+                <option value="WTS">Want to sell</option>
+                <option value="Giveaway">Giveaway</option>
+              </select>
+            </div>
+            <div class="th-field" style="flex:1 1 180px;">
+              <label for="thRoblox">Roblox name <span class="th-opt">optional</span></label>
+              <input type="text" id="thRoblox" placeholder="YourRobloxName" maxlength="40" autocomplete="off">
+            </div>
+          </div>
+          <p class="th-hint">Your Discord name comes from signing in. Adding a Roblox name is optional and public.</p>
+          <label for="thDiscord" class="th-hidden-label">Discord username</label>
+          <input type="text" id="thDiscord" class="th-hidden-field" placeholder="yourname" maxlength="40" autocomplete="off" aria-hidden="true" tabindex="-1">
+          <div class="th-row" style="margin-top:10px;">
+            <button type="button" class="btn-util sm" id="thCopy">Copy as text</button>
+            <button type="button" class="btn-util sm" id="thImage">Save as image</button>
+          </div>
+          <pre class="th-preview" id="thPreview" aria-live="polite" style="margin-top:10px;"></pre>
+        </div>
+      </details>
     </div>
   </details>
 </section>
@@ -3728,6 +3744,7 @@ initPetLevelCalculator();
    tag is optional and can be 'new', 'fixed' or 'changed'.
 ============================================================ */
 const SITE_NEWS = [
+  { date:'7 Sep 2026', tag:'changed', text:'Trading page simplified — the offers board is front and centre, posting is one panel, and drafts are gone.' },
   { date:'7 Sep 2026', tag:'new',     text:'Trading Hub: item and pet pictures on every offer, a cleaner board layout, and on-site messages with an unread badge.' },
   { date:'7 Sep 2026', tag:'new',     text:'New Trading Hub — build a trade post from real item and pet data, add your Discord, and keep your listings for reposting.' },
   { date:'7 Sep 2026', tag:'new',     text:'Nightmare pack completed — Gashadokuro (Eternal) added with its artwork, stats and drop odds.' },
@@ -3899,10 +3916,9 @@ const WF = (function(){
    Builds a trade post from the site's real item and pet data and keeps a
    local list of your own listings.
 
-   Deliberate limitation: there is no server here, so listings live in this
-   browser's localStorage and are visible to nobody else. Everything is
-   written against a small store interface so a backend can be dropped in
-   later via TradingHub.configureRemote() without touching the UI.
+   Holds the list of tradeable things and turns a filled-in offer into the
+   text that goes on the board. The board itself lives in Supabase — see
+   the TRADE BOARD block further down.
 ============================================================ */
 const TradingHub = (function(){
   const KEY = 'weaponFactoryTrading.v1';
@@ -3918,34 +3934,17 @@ const TradingHub = (function(){
   const QUALITY_OPTS = (typeof QUALITIES !== 'undefined') ? QUALITIES : ['Normal'];
 
   /* ---------- storage ---------- */
-  let data = null, remote = null;
+  let data = null;
   function load(){
     let d = null;
     try{ const raw = safeStorageGet(KEY); if(raw) d = JSON.parse(raw); }catch(e){ d = null; }
     if(!d || typeof d !== 'object') d = {};
     d.discord = typeof d.discord === 'string' ? d.discord : '';
     d.roblox  = typeof d.roblox === 'string' ? d.roblox : '';
-    d.listings = Array.isArray(d.listings) ? d.listings : [];
     return d;
   }
   function save(){ try{ return safeStorageSet(KEY, JSON.stringify(data)); }catch(e){ return false; } }
   data = load();
-
-  function configureRemote(cfg){ remote = (cfg && cfg.endpoint) ? Object.assign({ headers:{} }, cfg) : null; return !!remote; }
-  async function fetchListings(){
-    if(!remote) return data.listings;
-    const res = await fetch(remote.endpoint.replace(/\/$/,'') + '/listings', { headers: remote.headers });
-    if(!res.ok) throw new Error('server replied ' + res.status);
-    const json = await res.json();
-    return Array.isArray(json && json.listings) ? json.listings : [];
-  }
-  async function pushListing(listing){
-    if(!remote){ data.listings.unshift(listing); save(); return listing; }
-    const res = await fetch(remote.endpoint.replace(/\/$/,'') + '/listings', {
-      method:'POST', headers: Object.assign({ 'Content-Type':'application/json' }, remote.headers), body: JSON.stringify(listing) });
-    if(!res.ok) throw new Error('server replied ' + res.status);
-    return await res.json();
-  }
 
   /* ---------- post text ---------- */
   const ROMAN = WF.ROMAN;
@@ -3977,7 +3976,7 @@ const TradingHub = (function(){
   }
 
   return { TRADE_ITEMS, ITEM_BY_KEY, QUALITY_OPTS, MAX_LINES, data: () => data, save,
-           configureRemote, fetchListings, pushListing, buildPost, lineLabel, isRemote: () => !!remote };
+           buildPost, lineLabel };
 })();
 
 /* ============================================================
@@ -4088,7 +4087,12 @@ function itemThumbHTML(line, size){
           list.innerHTML = '<div class="th-sug-none">Nothing matches \u201c' + esc(box.value) + '\u201d</div>';
         } else {
           list.innerHTML = found.map(function(i){
-            return '<button type="button" data-k="' + esc(i.key) + '"><span>' + esc(i.label) + '</span><small>' + esc(i.group) + '</small></button>';
+            const probe = { key:i.key, tier:1, qty:1, quality:'Normal', level:'' };
+            const tag = i.rarity ? i.rarity : i.group;
+            return '<button type="button" data-k="' + esc(i.key) + '">' +
+                   itemThumbHTML(probe, 28) +
+                   '<span class="th-sug-name">' + esc(i.label) + '</span>' +
+                   '<small>' + esc(tag) + '</small></button>';
           }).join('');
           list.querySelectorAll('button').forEach(function(bt){
             bt.addEventListener('mousedown', function(e){
@@ -4155,52 +4159,20 @@ function itemThumbHTML(line, size){
   }
 
   function update(){
-    state.kind = $('thKind').value; state.note = $('thNote').value.trim();
-    state.discord = $('thDiscord').value.trim(); state.roblox = $('thRoblox').value.trim();
-    $('thPreview').textContent = TradingHub.buildPost(state);
+    state.note = $('thNote') ? $('thNote').value.trim() : '';
+    state.discord = $('thDiscord') ? $('thDiscord').value.trim() : state.discord;
+    state.roblox = $('thRoblox') ? $('thRoblox').value.trim() : '';
+    state.kind = $('thKind') ? $('thKind').value : state.kind;
+    if($('thPreview')) $('thPreview').textContent = TradingHub.buildPost(state);
     const filled = state.have.concat(state.want).some(l => l.key);
-    $('thCopy').disabled = !filled; $('thSave').disabled = !filled; $('thImage').disabled = !filled;
+    ['thCopy','thImage','thPost'].forEach(id => { const el = $(id); if(el) el.disabled = !filled; });
   }
 
   function saveContact(){
     const d = TradingHub.data();
-    d.discord = $('thDiscord').value.trim(); d.roblox = $('thRoblox').value.trim();
+    if($('thDiscord')) d.discord = $('thDiscord').value.trim();
+    if($('thRoblox')) d.roblox = $('thRoblox').value.trim();
     TradingHub.save();
-  }
-
-  function renderList(){
-    const d = TradingHub.data(); const box = $('thList');
-    $('thCount').textContent = d.listings.length ? `${d.listings.length} saved on this device` : '';
-    if(!d.listings.length){
-      box.innerHTML = `<div class="th-empty">No drafts yet. Build a post above and press <b>Save draft on this device</b> to keep it here for reposting later.</div>`;
-      return;
-    }
-    box.innerHTML = d.listings.map(l => `<div class="th-card">
-        <div class="th-card-top">
-          <span class="th-tag">${esc(l.kind)}</span>
-          <span class="th-when">${esc(new Date(l.at).toLocaleDateString())}</span>
-          <button type="button" class="btn-util sm" data-reuse="${esc(l.id)}">Load</button>
-          <button type="button" class="btn-util sm" data-copy="${esc(l.id)}">Copy</button>
-          <button type="button" class="btn-util sm danger" data-del="${esc(l.id)}">Delete</button>
-        </div>
-        <pre class="th-card-body">${esc(l.text)}</pre>
-      </div>`).join('');
-    box.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
-      const d2 = TradingHub.data(); d2.listings = d2.listings.filter(x => x.id !== b.dataset.del); TradingHub.save(); renderList(); toast('Listing deleted');
-    }));
-    box.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
-      const l = TradingHub.data().listings.find(x => x.id === b.dataset.copy);
-      try{ await navigator.clipboard.writeText(l.text); toast('Post copied'); }catch(e){ toast('Copy failed — select the text by hand'); }
-    }));
-    box.querySelectorAll('[data-reuse]').forEach(b => b.addEventListener('click', () => {
-      const l = TradingHub.data().listings.find(x => x.id === b.dataset.reuse);
-      if(!l || !l.state) { toast('That listing has no editable copy'); return; }
-      state.kind = l.state.kind; state.note = l.state.note || '';
-      state.have = JSON.parse(JSON.stringify(l.state.have)); state.want = JSON.parse(JSON.stringify(l.state.want));
-      $('thKind').value = state.kind; $('thNote').value = state.note;
-      renderSide('have'); renderSide('want'); update();
-      $('thPreview').scrollIntoView({ block:'center' }); toast('Loaded into the builder');
-    }));
   }
 
   function drawCard(){
@@ -4224,39 +4196,38 @@ function itemThumbHTML(line, size){
   }
 
   /* wiring */
-  $('thDiscord').value = state.discord; $('thRoblox').value = state.roblox;
-  ['thDiscord','thRoblox'].forEach(id => $(id).addEventListener('change', () => { saveContact(); update(); }));
-  ['thKind','thNote'].forEach(id => $(id).addEventListener('input', update));
-  $('thKind').addEventListener('change', update);
+  // some controls live behind "More options" and may not exist
+  function on(id, ev, fn){ const el = $(id); if(el) el.addEventListener(ev, fn); }
+  if($('thDiscord')) $('thDiscord').value = state.discord;
+  if($('thRoblox')) $('thRoblox').value = state.roblox;
+  ['thDiscord','thRoblox'].forEach(id => on(id, 'change', () => { saveContact(); update(); }));
+  ['thKind','thNote'].forEach(id => on(id, 'input', update));
+  on('thKind', 'change', update);
   document.querySelectorAll('#trading [data-add]').forEach(b => b.addEventListener('click', () => {
     const side = b.dataset.add;
     if(state[side].length >= TradingHub.MAX_LINES) return;
     state[side].push({ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' });
     renderSide(side); update();
   }));
-  $('thCopy').addEventListener('click', async () => {
-    try{ await navigator.clipboard.writeText(TradingHub.buildPost(state)); toast('Post copied — paste it into Discord'); }
-    catch(e){ toast('Copy failed — select the text above by hand'); }
+  on('thCopy', 'click', async () => {
+    try{ await navigator.clipboard.writeText(TradingHub.buildPost(state)); toast('Copied'); }
+    catch(e){ toast('Copy failed — select the text by hand'); }
   });
-  $('thImage').addEventListener('click', () => {
+  on('thImage', 'click', () => {
     const c = drawCard();
     const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = 'weapon-factory-trade.png'; a.click();
     toast('Image card downloaded');
   });
-  $('thSave').addEventListener('click', async () => {
-    const listing = { id: 't' + Date.now().toString(36), at: Date.now(), kind: state.kind,
-                      text: TradingHub.buildPost(state), state: JSON.parse(JSON.stringify({ kind:state.kind, note:state.note, have:state.have, want:state.want })) };
-    try{ await TradingHub.pushListing(listing); renderList(); toast(TradingHub.isRemote() ? 'Posted' : 'Saved on this device'); }
-    catch(e){ toast('Could not save: ' + e.message); }
-  });
-  $('thReset').addEventListener('click', () => {
+
+  on('thReset', 'click', () => {
     state.kind='Trade'; state.note=''; state.have=[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }]; state.want=[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }];
-    $('thKind').value='Trade'; $('thNote').value='';
+    if($('thKind')) $('thKind').value='Trade';
+    if($('thNote')) $('thNote').value='';
     renderSide('have'); renderSide('want'); update();
   });
 
   window.__thState = () => state;
-  renderSide('have'); renderSide('want'); update(); renderList();
+  renderSide('have'); renderSide('want'); update();
 })();
 
 /* ============================================================
@@ -4304,7 +4275,7 @@ function itemThumbHTML(line, size){
     const me = Account.user();
     if(loading && !rows.length){ board.innerHTML = `<div class="th-empty">Loading the board\u2026</div>`; return; }
     if(!rows.length){
-      board.innerHTML = `<div class="th-empty">No offers on the board yet.${me ? ' Build a post below and press <b>Post to board</b>.' : ' Sign in with Discord to be the first.'}</div>`;
+      board.innerHTML = `<div class="th-empty">No offers on the board yet.${me ? ' Build a post below and press <b>Post an offer</b>.' : ' Sign in with Discord to be the first.'}</div>`;
       return;
     }
     board.innerHTML = rows.map(r => {
@@ -4374,9 +4345,11 @@ function itemThumbHTML(line, size){
       have: state.have.filter(l => l.key), want: state.want.filter(l => l.key),
       body
     });
-    btn.disabled = false; btn.textContent = 'Post to board';
+    btn.disabled = false; btn.textContent = 'Post my offer';
     if(error){ toast('Could not post: ' + error.message); return; }
-    toast('Posted to the board');
+    toast('Your offer is up');
+    const maker = document.getElementById('thMaker');
+    if(maker) maker.open = false;
     load();
   }
 
