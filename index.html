@@ -717,6 +717,17 @@
     .th-server-body{ font-size:0.86rem; }
   }
 
+  .th-acct{
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+    padding:12px 14px; border:2px solid var(--ink); background:var(--bg);
+  }
+  .th-acct-on{ border-color:var(--green); }
+  .th-acct-off{ border-style:dashed; }
+  .th-acct-k{ font-family:'JetBrains Mono', monospace; font-size:0.62rem; letter-spacing:1.1px; text-transform:uppercase; color:var(--ink-dim); }
+  .th-acct-v{ font-family:'Barlow Condensed', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; font-size:1.05rem; }
+  .th-avatar{ width:44px; height:44px; border:2px solid var(--ink); flex:0 0 auto; }
+  .th-acct .th-hint{ max-width:46ch; }
+
   /* ---------- HORIZONTAL SECTION DECK ----------
      Sections sit side by side and snap one at a time; each slide scrolls
      vertically on its own for tall content like the pack index. Everything
@@ -1109,6 +1120,7 @@
 
   <div class="craft-panel" style="margin-top:20px;">
     <h3 class="th-h">Your contact</h3>
+    <div id="thAccount" style="margin-bottom:14px;"></div>
     <div class="th-row">
       <div class="th-field" style="flex:2 1 220px;">
         <label for="thDiscord">Discord username</label>
@@ -1211,7 +1223,138 @@
 
 <div class="toast" id="toast" aria-live="polite">Copied!</div>
 
+<!-- Supabase client. Does nothing until the two keys at the top of the script below are filled in. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ============================================================
+   SUPABASE — PASTE YOUR TWO KEYS HERE
+   ------------------------------------------------------------
+   Get both from your Supabase dashboard:
+     Project Settings (gear, bottom left) → API
+       • "Project URL"       → SUPABASE_URL
+       • "anon public" key   → SUPABASE_ANON_KEY
+
+   These two are SAFE in this file — the anon key is meant to be
+   public and is protected by your database's Row Level Security.
+   NEVER paste the "service_role" key here. That one bypasses every
+   security rule and must only ever live on a server.
+
+   Leave them blank and the site works exactly as before, with the
+   Trading Hub saving to this device only.
+============================================================ */
+const SUPABASE_URL      = 'https://fceagynhoiamfkgiizsn.supabase.co';   // base project URL — no /rest/v1/ on the end
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjZWFneW5ob2lhbWZrZ2lpenNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNjExMzgsImV4cCI6MjEwNDYzNzEzOH0.hzOJFF1nbNgq5M15fZp77snryNuU-zWYJ9EK9tXk4gg';
+
+/* ============================================================
+   ACCOUNT — Discord sign-in through Supabase
+   Nothing here runs until both keys above are filled in.
+============================================================ */
+const Account = (function(){
+  let client = null, user = null;
+  const listeners = [];
+  const configured = () => !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+
+  function init(){
+    if(!configured()) return null;
+    if(!window.supabase || !window.supabase.createClient){
+      console.warn('Supabase library did not load — check the CDN script tag.');
+      return null;
+    }
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    client.auth.getSession().then(({ data }) => { setUser(data && data.session ? data.session.user : null); });
+    client.auth.onAuthStateChange((_e, session) => { setUser(session ? session.user : null); });
+    return client;
+  }
+  function setUser(u){ user = u; listeners.forEach(fn => { try{ fn(u); }catch(e){} }); }
+  function onChange(fn){ listeners.push(fn); if(user !== undefined) fn(user); }
+
+  async function signIn(){
+    if(!client) throw new Error('Supabase is not configured yet');
+    // Come back to this exact page after Discord sends the user home.
+    const redirectTo = window.location.origin + window.location.pathname;
+    const { error } = await client.auth.signInWithOAuth({ provider:'discord', options:{ redirectTo } });
+    if(error) throw error;
+  }
+  async function signOut(){ if(client) await client.auth.signOut(); }
+
+  // Discord hands back a few name fields depending on the account age.
+  function profile(){
+    if(!user) return null;
+    const m = user.user_metadata || {};
+    return {
+      id: user.id,
+      discordId: m.provider_id || m.sub || null,
+      name: m.custom_claims && m.custom_claims.global_name ? m.custom_claims.global_name
+            : (m.full_name || m.name || m.user_name || m.preferred_username || 'Discord user'),
+      handle: m.user_name || m.preferred_username || null,
+      avatar: m.avatar_url || null
+    };
+  }
+
+  return { init, onChange, signIn, signOut, profile, configured, user: () => user, client: () => client };
+})();
+
+/* ---------- login panel inside the Trading Hub ---------- */
+(function(){
+  const box = document.getElementById('thAccount');
+  if(!box) return;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  function renderUnconfigured(){
+    box.innerHTML = `<div class="th-acct th-acct-off">
+      <div>
+        <div class="th-acct-k">Discord sign-in</div>
+        <div class="th-acct-v">Not connected yet</div>
+        <div class="th-hint" style="margin-top:4px;">Paste your Supabase Project URL and anon key near the top of index.html to switch this on. Until then, type your handle below and the hub works on this device.</div>
+      </div>
+    </div>`;
+  }
+  function renderSignedOut(){
+    box.innerHTML = `<div class="th-acct">
+      <div>
+        <div class="th-acct-k">Discord sign-in</div>
+        <div class="th-acct-v">Not signed in</div>
+      </div>
+      <button type="button" class="btn-util primary" id="thLogin">Sign in with Discord</button>
+    </div>`;
+    document.getElementById('thLogin').addEventListener('click', async e => {
+      e.target.disabled = true; e.target.textContent = 'Opening Discord…';
+      try{ await Account.signIn(); }
+      catch(err){ e.target.disabled = false; e.target.textContent = 'Sign in with Discord'; alert('Sign-in failed: ' + err.message); }
+    });
+  }
+  function renderSignedIn(p){
+    box.innerHTML = `<div class="th-acct th-acct-on">
+      ${p.avatar ? `<img class="th-avatar" src="${esc(p.avatar)}" alt="">` : ''}
+      <div>
+        <div class="th-acct-k">Signed in as</div>
+        <div class="th-acct-v">${esc(p.name)}${p.handle ? ` <span class="th-hint" style="margin:0">@${esc(p.handle)}</span>` : ''}</div>
+      </div>
+      <button type="button" class="btn-util" id="thLogout">Sign out</button>
+    </div>`;
+    document.getElementById('thLogout').addEventListener('click', () => Account.signOut());
+    // Fill the Discord field from the real account so posts carry a verified name.
+    const f = document.getElementById('thDiscord');
+    if(f && p.handle && !f.value){ f.value = p.handle; f.dispatchEvent(new Event('change')); }
+  }
+
+  function renderLibError(){
+    box.innerHTML = `<div class="th-acct th-acct-off">
+      <div>
+        <div class="th-acct-k">Discord sign-in</div>
+        <div class="th-acct-v">Sign-in unavailable</div>
+        <div class="th-hint" style="margin-top:4px;">The sign-in library could not be reached — usually a network block, an ad blocker, or being offline. The rest of the site is unaffected.</div>
+      </div>
+      <button type="button" class="btn-util" id="thRetry">Try again</button>
+    </div>`;
+    document.getElementById('thRetry').addEventListener('click', () => location.reload());
+  }
+
+  if(!Account.configured()){ renderUnconfigured(); return; }
+  if(!Account.init()){ renderLibError(); return; }
+  Account.onChange(u => { const p = Account.profile(); if(p) renderSignedIn(p); else renderSignedOut(); });
+})();
+
 /* ============================================================
    EASILY-EDITABLE CONSTANTS
    Update this date whenever the recipe data below is refreshed.
