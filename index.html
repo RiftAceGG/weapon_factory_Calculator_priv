@@ -977,13 +977,19 @@
   /* Pot type pickers: four grouped dropdowns instead of 17 buttons. */
   .variant-row.grouped{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; }
   .vgroup{ display:flex; flex-direction:column; gap:5px; border:2px solid var(--ink); background:var(--bg); padding:8px 10px; }
-  .vgroup.active{ background:var(--tint-blue); border-color:var(--blue); }
+  /* Selected group uses the same orange-to-pink gradient as the active
+     category tab above it, so "which pot type am I on" reads the same way as
+     "which category am I on". Identical in light and dark. */
+  .vgroup.active{ background:linear-gradient(135deg, var(--orange), var(--pink)); border-color:var(--ink); }
   .vgroup label{ font-family:'JetBrains Mono', monospace; font-size:0.62rem; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink-dim); }
-  .vgroup.active label{ color:var(--blue); }
+  .vgroup.active label{ color:#fff; }
   .vgroup select{ min-height:42px; padding:8px 10px; border:2px solid var(--ink); background:var(--panel); color:var(--ink);
     font-family:'Barlow Condensed', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:1px; font-size:0.9rem; width:100%; }
-  .vgroup.active select{ background:var(--blue); color:#fff; border-color:var(--blue); }
-  .vgroup select:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+  .vgroup.active select{ background:transparent; color:#fff; border-color:#fff; }
+  /* A native dropdown list cannot be transparent, so the open menu gets a
+     solid colour from the same family — readable in both themes. */
+  .vgroup.active select option{ background:#c2185b; color:#fff; }
+  .vgroup select:focus-visible{ outline:3px solid var(--yellow); outline-offset:2px; }
   @media (max-width:560px){
     .variant-row.grouped{ grid-template-columns:1fr 1fr; gap:8px; }
     .vgroup{ padding:6px 8px; }
