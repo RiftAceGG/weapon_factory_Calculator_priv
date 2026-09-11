@@ -707,8 +707,10 @@
     .th-sides{ grid-template-columns:1fr; }
   }
   @media (max-width:560px){
-    .th-line{ grid-template-columns:1fr 84px auto; grid-template-areas:"item item item" "qty tier del"; }
-    .th-line .th-item{ grid-area:item; }
+    .th-line{ grid-template-columns:1fr 76px 58px auto; grid-template-areas:"item item item item" "qty tier lvl del"; }
+    .th-pick{ grid-area:item; }
+    .th-lvl{ grid-area:lvl; width:100%; }
+
     .th-line .th-qty{ grid-area:qty; }
     .th-line .th-tier{ grid-area:tier; width:100%; }
     .th-del{ grid-area:del; width:auto; min-width:44px; }
@@ -737,6 +739,77 @@
   @media (max-width:560px){
     .th-post-body{ font-size:0.72rem; padding:9px 10px; }
     .th-post-top{ padding:7px 8px; }
+  }
+
+  .th-pick{ position:relative; min-width:0; }
+  .th-item.chosen{ font-weight:700; }
+  .th-sug{
+    position:absolute; left:0; right:0; top:calc(100% + 2px); z-index:40;
+    max-height:246px; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    border:2px solid var(--ink); background:var(--panel); box-shadow:4px 4px 0 var(--ink);
+  }
+  .th-sug button{
+    display:flex; width:100%; align-items:baseline; justify-content:space-between; gap:8px;
+    padding:10px 11px; min-height:44px; border:0; border-bottom:1px solid var(--line);
+    background:transparent; color:var(--ink); text-align:left; cursor:pointer;
+    font-family:'Barlow', sans-serif; font-size:0.94rem;
+  }
+  .th-sug button:hover, .th-sug button:focus-visible{ background:var(--yellow); color:#17181c; }
+  .th-sug button small{ font-family:'JetBrains Mono', monospace; font-size:0.58rem; letter-spacing:0.5px; text-transform:uppercase; color:var(--ink-dim); white-space:nowrap; }
+  .th-sug button:hover small{ color:#17181c; }
+  .th-sug-none{ padding:12px; font-family:'JetBrains Mono', monospace; font-size:0.72rem; color:var(--ink-dim); }
+  .th-lvl{
+    width:60px; min-height:42px; padding:7px 6px; border:2px solid var(--ink); background:var(--panel);
+    color:var(--ink); font-family:'JetBrains Mono', monospace; font-size:0.82rem; text-align:center;
+  }
+
+  .th-thumb{
+    display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;
+    border:2px solid var(--ink); background-size:cover; background-position:center; overflow:hidden;
+  }
+  .th-thumb img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .th-thumb-none{ background:var(--panel-2); }
+  .th-line .th-thumb{ grid-area:art; }
+  .th-lines .th-line{ grid-template-columns:44px 1fr 74px auto auto; }
+
+  /* board posts, laid out rather than dumped as a text block */
+  .th-post-grid{ display:grid; grid-template-columns:1fr auto 1fr; gap:10px; padding:12px; align-items:start; }
+  .th-col-k{ font-family:'JetBrains Mono', monospace; font-size:0.58rem; letter-spacing:1.1px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; }
+  .th-goods{ display:grid; gap:6px; }
+  .th-good{ display:flex; align-items:center; gap:8px; font-size:0.88rem; line-height:1.3; }
+  .th-good b{ font-family:'JetBrains Mono', monospace; font-size:0.78rem; }
+  .th-good .th-sub{ font-family:'JetBrains Mono', monospace; font-size:0.6rem; color:var(--ink-dim); display:block; }
+  .th-swap{ align-self:center; font-family:'Anton', sans-serif; font-size:1.3rem; color:var(--orange); }
+  .th-note{ padding:0 12px 10px; font-size:0.86rem; color:var(--ink-dim); }
+  .th-post-actions{ display:flex; flex-wrap:wrap; gap:8px; padding:0 12px 12px; }
+  @media (max-width:560px){
+    .th-lines .th-line{ grid-template-columns:38px 1fr 62px 52px auto; grid-template-areas:"art item item item item" ". qty tier lvl del"; }
+    .th-post-grid{ grid-template-columns:1fr; gap:6px; }
+    .th-swap{ justify-self:center; transform:rotate(90deg); }
+  }
+
+  .th-chat-list{
+    border:2px solid var(--ink); background:var(--bg); padding:10px;
+    max-height:300px; overflow-y:auto; -webkit-overflow-scrolling:touch; display:grid; gap:8px;
+  }
+  .th-msg{ border:2px solid var(--ink); background:var(--panel); padding:8px 10px; max-width:88%; }
+  .th-msg.mine{ margin-left:auto; background:var(--tint-blue); border-color:var(--blue); }
+  .th-msg-who{ font-family:'JetBrains Mono', monospace; font-size:0.6rem; letter-spacing:0.6px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:3px; }
+  .th-msg-body{ font-size:0.9rem; line-height:1.45; word-break:break-word; }
+  .th-chat-send{ display:flex; gap:8px; margin-top:10px; }
+  .th-chat-send input{
+    flex:1 1 auto; min-width:0; min-height:44px; padding:9px 11px; border:2px solid var(--ink);
+    background:var(--bg); color:var(--ink); font-family:'Barlow', sans-serif; font-size:1rem;
+  }
+  /* an explicit display beats the browser's [hidden] rule, so restore it */
+  .th-unread[hidden]{ display:none; }
+  .th-unread{
+    display:inline-block; min-width:20px; padding:1px 6px; margin-left:6px; border:2px solid var(--ink);
+    background:var(--orange); color:#fff; font-family:'JetBrains Mono', monospace; font-size:0.62rem; font-weight:700; text-align:center;
+  }
+  nav a[data-unread]:not([data-unread=""])::after{
+    content:attr(data-unread); margin-left:5px; padding:0 5px; border:2px solid var(--ink);
+    background:var(--orange); color:#fff; font-family:'JetBrains Mono', monospace; font-size:0.58rem; vertical-align:2px;
   }
 
   /* ---------- HORIZONTAL SECTION DECK ----------
@@ -1128,7 +1201,8 @@
   <div class="th-notice" id="thNotice">
     <b>How this works.</b> Sign in with Discord, build your offer, and press <b>Post to board</b> — everyone
     visiting the site sees it, and your Discord handle goes with it so they can message you there. You can have
-    up to 10 offers up at once and delete your own any time. <b>Nothing here is private:</b> anything you post is
+    up to 10 offers up at once and delete your own any time. Press <b>Message</b> on someone's offer to talk to
+    them here — only the two of you can read it, and they get a badge on the Trading link when they next open the site. <b>Nothing here is private:</b> anything you post is
     public, so never share passwords or personal details.
   </div>
 
@@ -1140,6 +1214,22 @@
     </div>
     <p class="th-hint" style="margin-bottom:12px;">Everyone's offers, newest first. New posts appear here on their own — no need to refresh.</p>
     <div id="thBoard"></div>
+  </div>
+
+  <div class="craft-panel th-chat" id="thChat" style="margin-top:16px;" hidden>
+    <div class="th-row" style="justify-content:space-between; align-items:center;">
+      <h3 class="th-h" style="margin:0;">Messages <span class="th-unread" id="thUnread" hidden>0</span></h3>
+      <div class="th-row">
+        <button type="button" class="btn-util sm" id="thNotifyBtn" hidden>Turn on notifications</button>
+        <button type="button" class="btn-util sm" id="thChatClose">Close</button>
+      </div>
+    </div>
+    <p class="th-hint" style="margin-bottom:10px;">Talking to <b id="thChatWith">—</b> <span id="thChatAbout"></span>. Only the two of you can read this.</p>
+    <div class="th-chat-list" id="thChatList"></div>
+    <div class="th-chat-send">
+      <input type="text" id="thChatInput" placeholder="Write a message…" maxlength="800" autocomplete="off" aria-label="Message">
+      <button type="button" class="btn-util primary" id="thChatSend">Send</button>
+    </div>
   </div>
 
   <div class="craft-panel" style="margin-top:16px;">
@@ -3638,6 +3728,7 @@ initPetLevelCalculator();
    tag is optional and can be 'new', 'fixed' or 'changed'.
 ============================================================ */
 const SITE_NEWS = [
+  { date:'7 Sep 2026', tag:'new',     text:'Trading Hub: item and pet pictures on every offer, a cleaner board layout, and on-site messages with an unread badge.' },
   { date:'7 Sep 2026', tag:'new',     text:'New Trading Hub — build a trade post from real item and pet data, add your Discord, and keep your listings for reposting.' },
   { date:'7 Sep 2026', tag:'new',     text:'Nightmare pack completed — Gashadokuro (Eternal) added with its artwork, stats and drop odds.' },
   { date:'7 Sep 2026', tag:'new',     text:'Pot types are now grouped into four dropdowns: Ascender, Machine, Packs and Dungeons.' },
@@ -3866,6 +3957,7 @@ const TradingHub = (function(){
     bits.push(it.label);
     if(it.tiers && line.tier) bits.push(ROMAN[line.tier-1] || ('T'+line.tier));
     if(!it.tiers && it.rarity && line.quality && line.quality !== 'Normal') bits.push('(' + line.quality + ')');
+    if(!it.tiers && it.rarity && (line.level === 0 || line.level)) bits.push('Lvl.' + line.level);
     return bits.join(' ');
   }
   function buildPost(state){
@@ -3888,6 +3980,60 @@ const TradingHub = (function(){
            configureRemote, fetchListings, pushListing, buildPost, lineLabel, isRemote: () => !!remote };
 })();
 
+/* ============================================================
+   ITEM ART
+   One bottle/clover sprite per item type, cut from an in-game
+   inventory screenshot. The game reuses the same bottle for every
+   tier and changes only the card colour behind it, so a single
+   sprite plus TIER_COLORS covers all ten tiers — which is exactly
+   how Souls I through X look in game.
+============================================================ */
+const ITEM_ART_BASE = 'img/item-';
+const ITEM_ART = {
+  'Ascender Speed':'ascender-speed', 'Class Luck':'class-luck', 'Enchant Luck':'enchant-luck',
+  'Exp':'exp', 'Gems':'gems', 'Loot Luck':'loot-luck', 'Luck':'luck',
+  'Machine Speed':'machine-speed', 'Mold Luck':'mold-luck', 'Money':'money',
+  'Pack Luck':'pack-luck', 'Pack Open':'pack-open', 'Pack Speed':'pack-speed',
+  'Quality Luck':'quality-luck', 'Rarity Luck':'rarity-luck', 'Souls':'souls',
+  'Weapon Type':'weapon-type',
+  // clovers
+  'Golden Pack':'golden-pack-clover', 'Pack':'pack-clover', 'Rainbow Pack':'rainbow-pack-clover',
+  'Shiny Pack':'shiny-pack-clover', 'Void Pack':'void-pack-clover'
+};
+
+/* Returns { src, tier } for a trade line, or null when there is no art. */
+function itemArtFor(line){
+  if(!line || !line.key) return null;
+  const it = TradingHub.ITEM_BY_KEY[line.key];
+  if(!it) return null;
+  if(line.key.startsWith('p:')){
+    const pet = ALL_PETS.find(p => 'p:' + p.id === line.key);
+    return pet ? { pet, style: getPetThumbStyle(pet) } : null;
+  }
+  // craftables: strip the category word to find the sprite
+  const bare = it.label.replace(/ (Pot|Clover|Artifact|Stone|Bag|Crate)s?$/i, '');
+  const slug = ITEM_ART[bare] || ITEM_ART[it.label];
+  if(!slug) return null;
+  // the single-file build carries the sprites inline; the split build links them
+  const src = (typeof ITEM_ART_DATA !== 'undefined' && ITEM_ART_DATA[slug]) || (ITEM_ART_BASE + slug + '.webp');
+  return { src, tier: it.tiers ? line.tier : null };
+}
+
+/* A small square tile: sprite on the tier colour, like the game's cards. */
+function itemThumbHTML(line, size){
+  const art = itemArtFor(line);
+  const px = size || 40;
+  if(!art){
+    return `<span class="th-thumb th-thumb-none" style="width:${px}px;height:${px}px" aria-hidden="true"></span>`;
+  }
+  if(art.pet){
+    return `<span class="th-thumb" style="width:${px}px;height:${px}px;${art.style}" aria-hidden="true"></span>`;
+  }
+  const bg = art.tier ? TIER_COLORS[art.tier-1] : 'var(--panel-2)';
+  return `<span class="th-thumb" style="width:${px}px;height:${px}px;background:${bg}" aria-hidden="true">
+    <img src="${art.src}" alt="" loading="lazy" decoding="async"></span>`;
+}
+
 /* ---------- trading hub UI ---------- */
 (function(){
   const $ = id => document.getElementById(id);
@@ -3896,18 +4042,23 @@ const TradingHub = (function(){
   const toast = msg => { const t = $('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1700); };
   const D = TradingHub.data();
 
-  const state = { kind:'Trade', note:'', have:[{ key:'', tier:1, qty:1, quality:'Normal' }], want:[{ key:'', tier:1, qty:1, quality:'Normal' }],
+  const state = { kind:'Trade', note:'', have:[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }], want:[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }],
                   discord:D.discord, roblox:D.roblox };
 
-  function itemSelect(sel, selected){
-    sel.innerHTML = '<option value="">— pick an item —</option>';
-    const groups = {};
-    TradingHub.TRADE_ITEMS.forEach(i => { (groups[i.group] = groups[i.group] || []).push(i); });
-    Object.keys(groups).forEach(g => {
-      const og = document.createElement('optgroup'); og.label = g;
-      groups[g].forEach(i => { const o = document.createElement('option'); o.value = i.key; o.textContent = i.label; if(i.key === selected) o.selected = true; og.appendChild(o); });
-      sel.appendChild(og);
+  /* A 241-entry dropdown is painful on a phone, so each line is a text box
+     with a filtered suggestion list underneath. Typing narrows it; picking
+     an entry locks the line to that item. Pets also get a level box, since
+     a level 250 card is worth far more than a level 1 one. */
+  function matchItems(q){
+    q = q.trim().toLowerCase();
+    if(!q) return TradingHub.TRADE_ITEMS.slice(0, 12);
+    const starts = [], contains = [];
+    TradingHub.TRADE_ITEMS.forEach(i => {
+      const n = i.label.toLowerCase();
+      if(n.startsWith(q)) starts.push(i);
+      else if(n.includes(q) || i.group.toLowerCase().includes(q)) contains.push(i);
     });
+    return starts.concat(contains).slice(0, 12);
   }
 
   function renderSide(side){
@@ -3916,36 +4067,90 @@ const TradingHub = (function(){
     state[side].forEach((line, idx) => {
       const it = TradingHub.ITEM_BY_KEY[line.key];
       const row = document.createElement('div'); row.className = 'th-line';
-      const sel = document.createElement('select'); sel.className = 'th-item'; sel.setAttribute('aria-label','Item');
-      itemSelect(sel, line.key);
-      sel.addEventListener('change', () => { line.key = sel.value; line.tier = 1; renderSide(side); update(); });
-      row.appendChild(sel);
 
+      // --- item: type to search ---
+      const thumb = document.createElement('span');
+      thumb.innerHTML = itemThumbHTML(line, 40);
+      row.appendChild(thumb.firstElementChild);
+
+      const pick = document.createElement('div'); pick.className = 'th-pick';
+      const box = document.createElement('input');
+      box.type = 'text'; box.className = 'th-item'; box.autocomplete = 'off';
+      box.placeholder = 'Type an item or pet\u2026'; box.setAttribute('aria-label','Item');
+      box.value = it ? it.label : (line.text || '');
+      if(it) box.classList.add('chosen');
+      const list = document.createElement('div'); list.className = 'th-sug'; list.hidden = true;
+
+      function closeList(){ list.hidden = true; list.innerHTML = ''; }
+      function showList(){
+        const found = matchItems(box.value);
+        if(!found.length){
+          list.innerHTML = '<div class="th-sug-none">Nothing matches \u201c' + esc(box.value) + '\u201d</div>';
+        } else {
+          list.innerHTML = found.map(function(i){
+            return '<button type="button" data-k="' + esc(i.key) + '"><span>' + esc(i.label) + '</span><small>' + esc(i.group) + '</small></button>';
+          }).join('');
+          list.querySelectorAll('button').forEach(function(bt){
+            bt.addEventListener('mousedown', function(e){
+              e.preventDefault();
+              line.key = bt.dataset.k; line.text = ''; line.tier = 1; line.level = '';
+              closeList(); renderSide(side); update();
+            });
+          });
+        }
+        list.hidden = false;
+      }
+      box.addEventListener('focus', showList);
+      box.addEventListener('input', function(){ line.key = ''; line.text = box.value; box.classList.remove('chosen'); showList(); update(); });
+      box.addEventListener('blur', function(){ setTimeout(closeList, 120); });
+      box.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){ closeList(); return; }
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          const first = list.querySelector('button[data-k]');
+          if(first){ line.key = first.dataset.k; line.text = ''; line.tier = 1; line.level = ''; closeList(); renderSide(side); update(); }
+        }
+      });
+      pick.appendChild(box); pick.appendChild(list); row.appendChild(pick);
+
+      // --- quantity ---
       const qty = document.createElement('input');
       qty.type='text'; qty.inputMode='text'; qty.className='th-qty'; qty.value = line.qty; qty.setAttribute('aria-label','Quantity');
-      qty.addEventListener('change', () => { line.qty = Math.max(1, parseAbbrev(qty.value) || 1); qty.value = line.qty; update(); });
+      qty.addEventListener('change', function(){ line.qty = Math.max(1, parseAbbrev(qty.value) || 1); qty.value = line.qty; update(); });
       row.appendChild(qty);
 
+      // --- tier for craftables; quality + level for pets ---
       if(it && it.tiers){
         const t = document.createElement('select'); t.className='th-tier'; t.setAttribute('aria-label','Tier');
         for(let n = 1; n <= it.tiers; n++){ const o = document.createElement('option'); o.value = n; o.textContent = 'T' + n; o.style.background = TIER_COLORS[n-1]; o.style.color = TIER_TEXT[n-1]; if(n === line.tier) o.selected = true; t.appendChild(o); }
-        t.addEventListener('change', () => { line.tier = parseInt(t.value,10); update(); });
+        t.addEventListener('change', function(){ line.tier = parseInt(t.value,10); update(); });
         row.appendChild(t);
       } else if(it && it.rarity){
         const q = document.createElement('select'); q.className='th-tier'; q.setAttribute('aria-label','Quality');
-        TradingHub.QUALITY_OPTS.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; if(v === line.quality) o.selected = true; q.appendChild(o); });
-        q.addEventListener('change', () => { line.quality = q.value; update(); });
+        TradingHub.QUALITY_OPTS.forEach(function(v){ const o = document.createElement('option'); o.value = v; o.textContent = v; if(v === line.quality) o.selected = true; q.appendChild(o); });
+        q.addEventListener('change', function(){ line.quality = q.value; update(); });
         row.appendChild(q);
+        const lv = document.createElement('input');
+        lv.type='text'; lv.inputMode='numeric'; lv.className='th-lvl'; lv.placeholder='Lvl';
+        lv.value = line.level === 0 || line.level ? line.level : '';
+        lv.setAttribute('aria-label','Level (0-500)'); lv.title='Pet level, 0-500 \u2014 leave blank to omit';
+        lv.addEventListener('change', function(){
+          const n = parseInt(String(lv.value).replace(/[^0-9]/g,''), 10);
+          line.level = isNaN(n) ? '' : Math.max(0, Math.min(500, n));
+          lv.value = line.level === '' ? '' : line.level;
+          update();
+        });
+        row.appendChild(lv);
       }
 
       const del = document.createElement('button');
-      del.type='button'; del.className='th-del'; del.textContent='✕'; del.title='Remove this line'; del.setAttribute('aria-label','Remove line');
+      del.type='button'; del.className='th-del'; del.textContent='\u2715'; del.title='Remove this line'; del.setAttribute('aria-label','Remove line');
       del.disabled = state[side].length <= 1;
-      del.addEventListener('click', () => { state[side].splice(idx,1); if(!state[side].length) state[side].push({ key:'', tier:1, qty:1, quality:'Normal' }); renderSide(side); update(); });
+      del.addEventListener('click', function(){ state[side].splice(idx,1); if(!state[side].length) state[side].push({ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }); renderSide(side); update(); });
       row.appendChild(del);
       wrap.appendChild(row);
     });
-    const addBtn = document.querySelector(`[data-add="${side}"]`);
+    const addBtn = document.querySelector('[data-add="' + side + '"]');
     if(addBtn) addBtn.disabled = state[side].length >= TradingHub.MAX_LINES;
   }
 
@@ -4026,7 +4231,7 @@ const TradingHub = (function(){
   document.querySelectorAll('#trading [data-add]').forEach(b => b.addEventListener('click', () => {
     const side = b.dataset.add;
     if(state[side].length >= TradingHub.MAX_LINES) return;
-    state[side].push({ key:'', tier:1, qty:1, quality:'Normal' });
+    state[side].push({ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' });
     renderSide(side); update();
   }));
   $('thCopy').addEventListener('click', async () => {
@@ -4045,7 +4250,7 @@ const TradingHub = (function(){
     catch(e){ toast('Could not save: ' + e.message); }
   });
   $('thReset').addEventListener('click', () => {
-    state.kind='Trade'; state.note=''; state.have=[{ key:'', tier:1, qty:1, quality:'Normal' }]; state.want=[{ key:'', tier:1, qty:1, quality:'Normal' }];
+    state.kind='Trade'; state.note=''; state.have=[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }]; state.want=[{ key:'', tier:1, qty:1, quality:'Normal', level:'', text:'' }];
     $('thKind').value='Trade'; $('thNote').value='';
     renderSide('have'); renderSide('want'); update();
   });
@@ -4080,9 +4285,24 @@ const TradingHub = (function(){
     return new Date(iso).toLocaleDateString();
   }
 
+  function goodsHTML(lines){
+    if(!lines || !lines.length) return '<div class="th-good th-sub">nothing listed</div>';
+    return lines.map(l => {
+      const it = TradingHub.ITEM_BY_KEY[l.key];
+      if(!it) return '';
+      const bits = [];
+      if(it.tiers && l.tier) bits.push(WF.ROMAN[l.tier-1] || ('T'+l.tier));
+      if(!it.tiers && it.rarity && l.quality && l.quality !== 'Normal') bits.push(l.quality);
+      if(!it.tiers && it.rarity && (l.level === 0 || l.level)) bits.push('Lvl.' + l.level);
+      return `<div class="th-good">${itemThumbHTML(l, 34)}
+        <span><b>${l.qty && l.qty !== 1 ? Number(l.qty).toLocaleString() + '\u00d7 ' : ''}</b>${esc(it.label)}
+        ${bits.length ? `<span class="th-sub">${esc(bits.join(' \u00b7 '))}</span>` : ''}</span></div>`;
+    }).join('');
+  }
+
   function render(){
     const me = Account.user();
-    if(loading && !rows.length){ board.innerHTML = `<div class="th-empty">Loading the board…</div>`; return; }
+    if(loading && !rows.length){ board.innerHTML = `<div class="th-empty">Loading the board\u2026</div>`; return; }
     if(!rows.length){
       board.innerHTML = `<div class="th-empty">No offers on the board yet.${me ? ' Build a post below and press <b>Post to board</b>.' : ' Sign in with Discord to be the first.'}</div>`;
       return;
@@ -4090,17 +4310,33 @@ const TradingHub = (function(){
     board.innerHTML = rows.map(r => {
       const mine = me && r.user_id === me.id;
       const who = r.discord_handle ? '@' + r.discord_handle : (r.discord_name || 'Anonymous');
+      const have = Array.isArray(r.have) ? r.have : [];
+      const want = Array.isArray(r.want) ? r.want : [];
+      const structured = have.length || want.length;
       return `<div class="th-post${mine ? ' mine' : ''}">
         <div class="th-post-top">
           <span class="th-tag">${esc(KIND_LABEL[r.kind] || r.kind)}</span>
-          <span class="th-who">${esc(who)}${r.roblox ? ` <span class="th-when">· Roblox: ${esc(r.roblox)}</span>` : ''}</span>
+          <span class="th-who">${esc(who)}</span>
           <span class="th-when">${esc(ago(r.created_at))}</span>
-          ${mine ? `<button type="button" class="btn-util sm danger" data-del="${esc(r.id)}">Delete</button>` : ''}
         </div>
-        <pre class="th-post-body">${esc(r.body)}</pre>
+        ${structured ? `<div class="th-post-grid">
+          <div><div class="th-col-k">Offering</div><div class="th-goods">${goodsHTML(have)}</div></div>
+          <div class="th-swap">\u21c4</div>
+          <div><div class="th-col-k">Wants</div><div class="th-goods">${goodsHTML(want)}</div></div>
+        </div>` : `<pre class="th-post-body">${esc(r.body)}</pre>`}
+        ${r.note ? `<div class="th-note">\u201c${esc(r.note)}\u201d</div>` : ''}
+        <div class="th-post-actions">
+          ${mine ? `<button type="button" class="btn-util sm danger" data-del="${esc(r.id)}">Delete</button>`
+                 : `<button type="button" class="btn-util sm primary" data-msg="${esc(r.id)}">Message ${esc(who)}</button>`}
+          ${r.roblox ? `<span class="th-when">Roblox: ${esc(r.roblox)}</span>` : ''}
+        </div>
       </div>`;
     }).join('');
     board.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => remove(b.dataset.del)));
+    board.querySelectorAll('[data-msg]').forEach(b => b.addEventListener('click', () => {
+      const r = rows.find(x => x.id === b.dataset.msg);
+      if(r && window.Chat) window.Chat.open(r);
+    }));
   }
 
   async function load(){
@@ -4108,7 +4344,7 @@ const TradingHub = (function(){
     if(!client){ board.innerHTML = `<div class="th-empty">The board needs the sign-in library, which could not be reached. Try reloading.</div>`; return; }
     loading = true; render();
     const { data, error } = await client.from('listings')
-      .select('id,user_id,discord_name,discord_handle,roblox,kind,body,created_at')
+      .select('id,user_id,discord_name,discord_handle,roblox,kind,note,have,want,body,created_at')
       .order('created_at', { ascending: false }).limit(50);
     loading = false;
     if(error){
@@ -4173,6 +4409,184 @@ const TradingHub = (function(){
 })();
 
 
+
+/* ============================================================
+   MESSAGES — talk to someone about their offer, on the site
+   One table, two policies, and Realtime: a message is readable
+   only by its sender and recipient. The unread count shows on the
+   Trading nav link and in the panel header.
+
+   Discord pings: a browser cannot DM someone on Discord — that
+   needs a bot token, which can never live in this file. The hook
+   for it is at the bottom of this block.
+============================================================ */
+window.Chat = (function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const toast = m => { const t = $('toast'); if(!t) return; t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); };
+
+  const panel = $('thChat'), listEl = $('thChatList'), inputEl = $('thChatInput');
+  let peer = null, listing = null, msgs = [], channel = null, unread = 0;
+  if(!panel) return { open(){}, };
+
+  function when(iso){
+    const d = new Date(iso), s = (Date.now()-d.getTime())/1000;
+    if(s < 60) return 'just now';
+    if(s < 3600) return Math.floor(s/60)+'m ago';
+    if(s < 86400) return Math.floor(s/3600)+'h ago';
+    return d.toLocaleDateString();
+  }
+
+  function renderThread(){
+    const me = Account.user();
+    if(!peer){ listEl.innerHTML = `<div class="th-empty">Pick <b>Message</b> on any offer to start a conversation.</div>`; return; }
+    if(!msgs.length){ listEl.innerHTML = `<div class="th-empty">No messages yet — say hello.</div>`; return; }
+    listEl.innerHTML = msgs.map(m => {
+      const mine = me && m.sender_id === me.id;
+      return `<div class="th-msg${mine ? ' mine' : ''}">
+        <div class="th-msg-who">${esc(mine ? 'You' : (m.sender_name || 'Them'))} <span class="th-when">${esc(when(m.created_at))}</span></div>
+        <div class="th-msg-body">${esc(m.body)}</div></div>`;
+    }).join('');
+    listEl.scrollTop = listEl.scrollHeight;
+  }
+
+  async function loadThread(){
+    const client = Account.client(), me = Account.user();
+    if(!client || !me || !peer) return;
+    const { data, error } = await client.from('messages')
+      .select('id,sender_id,recipient_id,sender_name,body,created_at,read_at')
+      .or(`and(sender_id.eq.${me.id},recipient_id.eq.${peer.id}),and(sender_id.eq.${peer.id},recipient_id.eq.${me.id})`)
+      .order('created_at', { ascending: true }).limit(200);
+    if(error){
+      listEl.innerHTML = `<div class="th-empty">Could not load messages.<br><b>${esc(error.message)}</b>` +
+        (/relation|does not exist/i.test(error.message) ? '<br>The <b>messages</b> table has not been created yet — run messages.sql in Supabase.' : '') + `</div>`;
+      return;
+    }
+    msgs = data || []; renderThread(); markRead();
+  }
+
+  async function markRead(){
+    const client = Account.client(), me = Account.user();
+    if(!client || !me || !peer) return;
+    const mine = msgs.filter(m => m.recipient_id === me.id && !m.read_at).map(m => m.id);
+    if(!mine.length) return;
+    await client.from('messages').update({ read_at: new Date().toISOString() }).in('id', mine);
+    refreshUnread();
+  }
+
+  async function refreshUnread(){
+    const client = Account.client(), me = Account.user();
+    const badge = $('thUnread'), dot = document.querySelector('.deck-dot[data-unread]');
+    if(!client || !me){ unread = 0; if(badge) badge.hidden = true; if(dot) dot.removeAttribute('data-unread'); return; }
+    const { count } = await client.from('messages')
+      .select('id', { count:'exact', head:true })
+      .eq('recipient_id', me.id).is('read_at', null);
+    unread = count || 0;
+    if(badge){ badge.hidden = !unread; badge.textContent = unread > 9 ? '9+' : String(unread); }
+    const link = document.querySelector('a[href="#trading"]');
+    if(link) link.dataset.unread = unread ? String(unread) : '';
+    // Browser notification, if the reader has allowed it.
+    if(unread > lastSeenUnread && document.visibilityState !== 'visible') notify(unread);
+    lastSeenUnread = unread;
+  }
+  let lastSeenUnread = 0;
+
+  function notify(n){
+    try{
+      if(!('Notification' in window) || Notification.permission !== 'granted') return;
+      new Notification('Weapon Factory Fan Hub', { body: `${n} unread trade message${n===1?'':'s'}`, tag:'wf-dm' });
+    }catch(e){}
+  }
+  async function askNotify(){
+    if(!('Notification' in window)){ toast('This browser cannot show notifications'); return; }
+    const p = await Notification.requestPermission();
+    toast(p === 'granted' ? 'Notifications on for this browser' : 'Notifications not allowed');
+    const b = $('thNotifyBtn'); if(b) b.hidden = Notification.permission === 'granted';
+  }
+
+  async function send(){
+    const client = Account.client(), me = Account.user(), p = Account.profile();
+    if(!client || !me){ toast('Sign in with Discord first'); return; }
+    if(!peer){ toast('Pick an offer to reply to'); return; }
+    const body = inputEl.value.trim();
+    if(!body) return;
+    const btn = $('thChatSend'); btn.disabled = true;
+    const { error } = await client.from('messages').insert({
+      listing_id: listing ? listing.id : null,
+      sender_id: me.id, recipient_id: peer.id,
+      sender_name: p ? p.name : null, body
+    });
+    btn.disabled = false;
+    if(error){ toast('Could not send: ' + error.message); return; }
+    inputEl.value = ''; loadThread();
+  }
+
+  function subscribe(){
+    const client = Account.client(), me = Account.user();
+    if(!client || !me || channel) return;
+    channel = client.channel('dm-' + me.id)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages', filter:`recipient_id=eq.${me.id}` },
+          () => { refreshUnread(); if(peer) loadThread(); })
+      .subscribe();
+  }
+
+  function open(row){
+    const me = Account.user();
+    if(!me){ toast('Sign in with Discord to message people'); $('thAccount').scrollIntoView({ block:'center' }); return; }
+    if(row.user_id === me.id){ toast('That is your own offer'); return; }
+    listing = row;
+    peer = { id: row.user_id, name: row.discord_handle ? '@'+row.discord_handle : (row.discord_name || 'Trader') };
+    $('thChatWith').textContent = peer.name;
+    $('thChatAbout').textContent = row.kind ? `about their ${row.kind === 'Trade' ? 'trade' : row.kind} offer` : '';
+    panel.hidden = false;
+    panel.scrollIntoView({ block:'center' });
+    inputEl.focus();
+    loadThread();
+  }
+
+  function init(){
+    if(!Account.configured()){
+      panel.hidden = false;
+      listEl.innerHTML = `<div class="th-empty">Messaging needs the Supabase keys in this file.</div>`;
+      return;
+    }
+    $('thChatSend').addEventListener('click', send);
+    inputEl.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+    $('thChatClose').addEventListener('click', () => { panel.hidden = true; peer = null; listing = null; });
+    const nb = $('thNotifyBtn');
+    if(nb){
+      nb.hidden = !('Notification' in window) || Notification.permission === 'granted';
+      nb.addEventListener('click', askNotify);
+    }
+    Account.onChange(() => { refreshUnread(); subscribe(); if(peer) loadThread(); });
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshUnread(); });
+  }
+  init();
+
+  /* ------------------------------------------------------------
+     DISCORD PINGS — needs a server piece
+     A page cannot DM on Discord: that requires a bot token, and a
+     token in this file would be public. The usual approach is a
+     Supabase Edge Function triggered on insert into messages,
+     holding the token as a secret, calling Discord's API. Sketch:
+
+       // supabase/functions/notify/index.ts
+       const { record } = await req.json();
+       await fetch('https://discord.com/api/v10/users/@me/channels', {
+         method:'POST',
+         headers:{ Authorization:`Bot ${Deno.env.get('DISCORD_TOKEN')}`,
+                   'Content-Type':'application/json' },
+         body: JSON.stringify({ recipient_id: record.discord_id })
+       });
+       // then POST the message to the returned channel id
+
+     You would store each user's Discord id on their listing (it is
+     already in Account.profile().discordId) and deploy the function
+     with a database webhook on messages.
+  ------------------------------------------------------------ */
+
+  return { open, refreshUnread };
+})();
 
 /* Pack art is stored as WebP to keep the page small. Every browser from
    ~2020 onward supports it; on anything older, say so plainly instead of
