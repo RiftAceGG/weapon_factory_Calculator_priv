@@ -728,12 +728,26 @@
   .th-avatar{ width:44px; height:44px; border:2px solid var(--ink); flex:0 0 auto; }
   .th-acct .th-hint{ max-width:46ch; }
 
+  .th-post{ border:2px solid var(--ink); background:var(--bg); margin-bottom:10px; }
+  .th-post.mine{ border-color:var(--blue); }
+  .th-post-top{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px 10px; border-bottom:2px solid var(--ink); background:var(--panel-2); }
+  .th-who{ font-family:'Barlow Condensed', sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; font-size:0.92rem; }
+  .th-post-top .th-when{ margin-left:auto; }
+  .th-post-body{ margin:0; padding:10px 12px; font-family:'JetBrains Mono', monospace; font-size:0.78rem; line-height:1.65; white-space:pre-wrap; word-break:break-word; }
+  @media (max-width:560px){
+    .th-post-body{ font-size:0.72rem; padding:9px 10px; }
+    .th-post-top{ padding:7px 8px; }
+  }
+
   /* ---------- HORIZONTAL SECTION DECK ----------
      Sections sit side by side and snap one at a time; each slide scrolls
      vertically on its own for tall content like the pack index. Everything
      still works without JS — the deck is a plain scroll container, so swipe
      and trackpad gestures page through it natively. */
-  html.deck-mode, html.deck-mode body{ height:100%; overflow:hidden; }
+  html.deck-mode, html.deck-mode body{ height:100vh; overflow:hidden; }
+  @supports (height: 100dvh){
+    html.deck-mode, html.deck-mode body{ height:100dvh; }
+  }
   .deck{
     display:flex; flex:1 1 auto; min-height:0;
     overflow-x:auto; overflow-y:hidden;
@@ -746,7 +760,7 @@
     scroll-snap-align:start; scroll-snap-stop:always;
     overflow-y:auto; overflow-x:hidden;
     -webkit-overflow-scrolling:touch; overscroll-behavior-y:contain;
-    padding-bottom:78px;   /* clear the dots */
+    padding-bottom:calc(78px + env(safe-area-inset-bottom, 0px));   /* clear the dots and any home bar */
   }
   .slide::-webkit-scrollbar{ width:10px; }
   .slide::-webkit-scrollbar-thumb{ background:var(--ink); }
@@ -1103,7 +1117,7 @@
   <p class="pet-team-best-note" id="petTeamBestNote"></p>
 </section>
 <div class="hazard"></div>
-
+</div>
 
 <div class="slide" id="slideTrading" data-title="Trading">
 <section id="trading">
@@ -1112,13 +1126,23 @@
   <p class="lede">Build a clean trade post from real item and pet data, then take it wherever your community trades. Your Discord handle is included so people can reach you.</p>
 
   <div class="th-notice" id="thNotice">
-    <b>Read this first.</b> This page runs entirely in your browser — there is no server behind it yet, so
-    <b>your posts stay on this device</b> and nobody else can see them. On-site chat and notifications need a
-    backend; see <b>Connecting a server</b> at the bottom of this page. Right now the hub's job is to build the
-    post for you so you can paste it into Discord.
+    <b>How this works.</b> Sign in with Discord, build your offer, and press <b>Post to board</b> — everyone
+    visiting the site sees it, and your Discord handle goes with it so they can message you there. You can have
+    up to 10 offers up at once and delete your own any time. <b>Nothing here is private:</b> anything you post is
+    public, so never share passwords or personal details.
   </div>
 
-  <div class="craft-panel" style="margin-top:20px;">
+
+  <div class="craft-panel" style="margin-top:16px;">
+    <div class="th-row" style="justify-content:space-between; align-items:center;">
+      <h3 class="th-h" style="margin:0;">Trade board <span class="th-opt" id="thBoardCount"></span></h3>
+      <button type="button" class="btn-util sm" id="thRefresh">Refresh</button>
+    </div>
+    <p class="th-hint" style="margin-bottom:12px;">Everyone's offers, newest first. New posts appear here on their own — no need to refresh.</p>
+    <div id="thBoard"></div>
+  </div>
+
+  <div class="craft-panel" style="margin-top:16px;">
     <h3 class="th-h">Your contact</h3>
     <div id="thAccount" style="margin-bottom:14px;"></div>
     <div class="th-row">
@@ -1169,14 +1193,15 @@
     <div class="th-row" style="margin-top:12px;">
       <button type="button" class="btn-util primary" id="thCopy">Copy post</button>
       <button type="button" class="btn-util" id="thImage">Make image card</button>
-      <button type="button" class="btn-util" id="thSave">Save to my listings</button>
+      <button type="button" class="btn-util primary" id="thPost">Post to board</button>
+      <button type="button" class="btn-util" id="thSave">Save draft on this device</button>
       <button type="button" class="btn-util danger" id="thReset">Start over</button>
     </div>
   </div>
 
   <div class="craft-panel" style="margin-top:16px;">
     <div class="th-row" style="justify-content:space-between;">
-      <h3 class="th-h" style="margin:0;">My saved listings</h3>
+      <h3 class="th-h" style="margin:0;">My drafts (this device)</h3>
       <span class="th-hint" id="thCount" style="margin:0;"></span>
     </div>
     <div id="thList" style="margin-top:12px;"></div>
@@ -1212,10 +1237,6 @@
   <p>Unofficial fan site. Not affiliated with Roblox Corporation or RedBolts.<br>Weapon Factory and all game assets belong to their respective creators.</p>
 </footer>
 </div>
-
-</div>
-
-
 </div>
 
 <nav class="deck-dots" id="deckDots" aria-label="Section navigation"></nav>
@@ -3946,7 +3967,7 @@ const TradingHub = (function(){
     const d = TradingHub.data(); const box = $('thList');
     $('thCount').textContent = d.listings.length ? `${d.listings.length} saved on this device` : '';
     if(!d.listings.length){
-      box.innerHTML = `<div class="th-empty">No listings saved yet. Build a post above and press <b>Save to my listings</b> to keep it here for reposting.</div>`;
+      box.innerHTML = `<div class="th-empty">No drafts yet. Build a post above and press <b>Save draft on this device</b> to keep it here for reposting later.</div>`;
       return;
     }
     box.innerHTML = d.listings.map(l => `<div class="th-card">
@@ -4029,8 +4050,129 @@ const TradingHub = (function(){
     renderSide('have'); renderSide('want'); update();
   });
 
+  window.__thState = () => state;
   renderSide('have'); renderSide('want'); update(); renderList();
 })();
+
+/* ============================================================
+   TRADE BOARD — listings everyone can see
+   Reads and writes the public.listings table through the same
+   Supabase client the sign-in uses. Row Level Security on that
+   table is what makes this safe with a public key: anyone may
+   read, only signed-in users may post, and only as themselves.
+============================================================ */
+(function(){
+  const $ = id => document.getElementById(id);
+  const board = $('thBoard');
+  if(!board) return;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const toast = msg => { const t = $('toast'); if(!t) return; t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1800); };
+
+  const KIND_LABEL = { Trade:'Trade', WTB:'Want to buy', WTS:'Want to sell', Giveaway:'Giveaway' };
+  let rows = [], loading = false, channel = null;
+
+  function ago(iso){
+    const s = (Date.now() - new Date(iso).getTime()) / 1000;
+    if(s < 60) return 'just now';
+    if(s < 3600) return Math.floor(s/60) + 'm ago';
+    if(s < 86400) return Math.floor(s/3600) + 'h ago';
+    if(s < 604800) return Math.floor(s/86400) + 'd ago';
+    return new Date(iso).toLocaleDateString();
+  }
+
+  function render(){
+    const me = Account.user();
+    if(loading && !rows.length){ board.innerHTML = `<div class="th-empty">Loading the board…</div>`; return; }
+    if(!rows.length){
+      board.innerHTML = `<div class="th-empty">No offers on the board yet.${me ? ' Build a post below and press <b>Post to board</b>.' : ' Sign in with Discord to be the first.'}</div>`;
+      return;
+    }
+    board.innerHTML = rows.map(r => {
+      const mine = me && r.user_id === me.id;
+      const who = r.discord_handle ? '@' + r.discord_handle : (r.discord_name || 'Anonymous');
+      return `<div class="th-post${mine ? ' mine' : ''}">
+        <div class="th-post-top">
+          <span class="th-tag">${esc(KIND_LABEL[r.kind] || r.kind)}</span>
+          <span class="th-who">${esc(who)}${r.roblox ? ` <span class="th-when">· Roblox: ${esc(r.roblox)}</span>` : ''}</span>
+          <span class="th-when">${esc(ago(r.created_at))}</span>
+          ${mine ? `<button type="button" class="btn-util sm danger" data-del="${esc(r.id)}">Delete</button>` : ''}
+        </div>
+        <pre class="th-post-body">${esc(r.body)}</pre>
+      </div>`;
+    }).join('');
+    board.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => remove(b.dataset.del)));
+  }
+
+  async function load(){
+    const client = Account.client();
+    if(!client){ board.innerHTML = `<div class="th-empty">The board needs the sign-in library, which could not be reached. Try reloading.</div>`; return; }
+    loading = true; render();
+    const { data, error } = await client.from('listings')
+      .select('id,user_id,discord_name,discord_handle,roblox,kind,body,created_at')
+      .order('created_at', { ascending: false }).limit(50);
+    loading = false;
+    if(error){
+      // The commonest cause is the SQL not having been run yet.
+      board.innerHTML = `<div class="th-empty">Could not load the board.<br><b>${esc(error.message)}</b><br>
+        ${/relation|does not exist|schema/i.test(error.message) ? 'That usually means the <b>listings</b> table has not been created yet — run the SQL in Supabase first.' : ''}</div>`;
+      return;
+    }
+    rows = data || []; render();
+    const n = $('thBoardCount'); if(n) n.textContent = rows.length ? `${rows.length} offer${rows.length===1?'':'s'}` : '';
+  }
+
+  async function post(){
+    const client = Account.client();
+    const p = Account.profile();
+    if(!client){ toast('Sign-in library unavailable'); return; }
+    if(!p){ toast('Sign in with Discord first'); $('thAccount').scrollIntoView({ block:'center' }); return; }
+    const state = window.__thState && window.__thState();
+    if(!state){ toast('Nothing to post yet'); return; }
+    const body = TradingHub.buildPost(state);
+    const btn = $('thPost'); btn.disabled = true; btn.textContent = 'Posting…';
+    const { error } = await client.from('listings').insert({
+      user_id: p.id,
+      discord_name: p.name, discord_handle: p.handle,
+      roblox: state.roblox || null,
+      kind: state.kind, note: state.note || null,
+      have: state.have.filter(l => l.key), want: state.want.filter(l => l.key),
+      body
+    });
+    btn.disabled = false; btn.textContent = 'Post to board';
+    if(error){ toast('Could not post: ' + error.message); return; }
+    toast('Posted to the board');
+    load();
+  }
+
+  async function remove(id){
+    const client = Account.client();
+    if(!client) return;
+    if(!confirm('Delete this listing from the board? This cannot be undone.')) return;
+    const { error } = await client.from('listings').delete().eq('id', id);
+    if(error){ toast('Could not delete: ' + error.message); return; }
+    rows = rows.filter(r => r.id !== id); render(); toast('Listing deleted');
+  }
+
+  // Live updates: new and removed listings arrive without a refresh.
+  function subscribe(){
+    const client = Account.client();
+    if(!client || channel) return;
+    channel = client.channel('listings-board')
+      .on('postgres_changes', { event:'*', schema:'public', table:'listings' }, () => load())
+      .subscribe();
+  }
+
+  if(!Account.configured()){
+    board.innerHTML = `<div class="th-empty">The shared board needs Supabase keys in this file. Until then, posts you build stay on this device.</div>`;
+    return;
+  }
+  $('thRefresh').addEventListener('click', load);
+  $('thPost').addEventListener('click', post);
+  Account.onChange(() => render());
+  load(); subscribe();
+})();
+
+
 
 /* Pack art is stored as WebP to keep the page small. Every browser from
    ~2020 onward supports it; on anything older, say so plainly instead of
