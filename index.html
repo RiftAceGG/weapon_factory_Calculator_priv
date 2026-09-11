@@ -1010,6 +1010,127 @@
     .wf-newslist li{ font-size:0.84rem; padding:7px 8px; }
     .wf-news-date{ font-size:0.58rem; }
   }
+
+  /* ============================================================
+     MOBILE LEGIBILITY PASS
+     An audit at 390×780 found a lot of text between 9 and 11px,
+     a header eating 126px of a 780px screen, and result cards
+     squeezed to the point of being hard to scan. This block sets
+     a floor on text size, gives the content more of the screen,
+     and adds breathing room between things. Desktop is untouched.
+  ============================================================ */
+  @media (max-width:560px){
+
+    /* --- give the content more of the screen --- */
+    header{ padding-top:10px; padding-bottom:6px; }
+    .nav-strip{ margin-top:6px; }
+    nav a{ font-size:0.9rem; padding:9px 2px; }
+
+    /* --- headings and intros --- */
+    section h2{ font-size:1.7rem; line-height:1.08; }
+    section h3{ font-size:1.05rem; }
+    .kicker{ font-size:0.68rem; }
+    .lede{ font-size:1rem; line-height:1.62; max-width:36ch; }
+
+    /* --- a floor on small print: nothing below 11.5px --- */
+    .rlabel, .result-card .rlabel{ font-size:0.72rem; letter-spacing:0.6px; line-height:1.35; }
+    .rexact, .result-card .rexact{ font-size:0.72rem; line-height:1.5; }
+    .plan-steps li .plan-gems{ font-size:0.74rem; }
+    .above-note, .scroll-hint{ font-size:0.74rem; line-height:1.6; }
+    .wf-kv, .wf-news-tag, .wf-news-date{ font-size:0.72rem; }
+    .th-hint, .th-acct-k, .th-opt, .th-unread, .th-when, .th-col-k{ font-size:0.72rem; }
+    .th-good .th-sub{ font-size:0.7rem; }
+    .th-sug-results button small{ font-size:0.66rem; }
+    label, .th-field label, .vgroup label{ font-size:0.72rem; letter-spacing:0.8px; }
+    .wf-table th, .th-card-body, .th-post-body{ font-size:0.78rem; }
+    .th-msg-body{ font-size:0.95rem; }
+
+    /* --- result cards: readable rather than merely small --- */
+    .result-grid{ gap:10px; }
+    .result-card{ padding:13px 11px; }
+    .result-card .rval{ font-size:1.15rem; margin-top:5px; }
+
+    /* --- plan steps: a little more air between them --- */
+    .plan-steps{ gap:8px; }
+    .plan-steps li{ padding:11px 11px 11px 40px; font-size:0.9rem; line-height:1.5; }
+    .plan-steps li::before{ left:9px; width:22px; height:22px; font-size:0.78rem; }
+    .plan-summary{ font-size:1rem; padding:13px 14px; line-height:1.55; }
+
+    /* --- every tap target at least 44px --- */
+    .craft-tab{ min-height:46px; padding:12px 18px; font-size:0.92rem; }
+    .vbtn{ min-height:42px; }
+    .variant-row.compact .vbtn{ font-size:0.7rem; padding:9px 10px; min-height:40px; }
+    .btn-util{ min-height:46px; }
+    .btn-util.sm{ min-height:40px; font-size:0.76rem; }
+    .th-del, .th-kind{ min-height:40px; }
+    .wf-news-more button{ min-height:42px; }
+    .theme-toggle, .theme-btn{ min-width:44px; min-height:44px; }
+
+    /* --- panels: less wasted edge, more inner room --- */
+    .craft-panel{ padding:16px 14px; }
+    .wf-panel{ padding:15px 13px; }
+    .th-side{ padding:13px 11px; }
+
+    /* --- nothing should scroll sideways --- */
+    .table-scroll, .wf-table-wrap{ max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .wf-table th, .wf-table td{ padding:8px 7px; }
+  }
+
+  /* A phone in landscape, or a small tablet, sits between the two
+     layouts and used to get the desktop spacing on a short screen. */
+  @media (min-width:561px) and (max-width:820px){
+    section{ padding:34px 20px; }
+    .lede{ font-size:1.02rem; max-width:52ch; }
+  }
+
+
+  /* Second pass: the leftovers the audit still found under 11.5px, and a
+     header that had grown taller than before. */
+  @media (max-width:560px){
+    header{ padding-top:8px; padding-bottom:4px; }
+    .brand, .brand-text{ font-size:1.05rem; }
+    nav a{ padding:7px 2px; }
+    .nav-strip{ margin-top:4px; }
+
+    .kicker{ font-size:0.76rem; letter-spacing:1.4px; }
+    .stat .label, .stats .label, .hero .label{ font-size:0.74rem; line-height:1.4; }
+    .wf-kv, .wf-news .wf-kv, #wfNewsCount{ font-size:0.74rem; }
+    .tier-swatch{ font-size:0.76rem; }
+    .table-scroll th, .table-scroll td{ font-size:0.78rem; padding:8px 7px; }
+    .th-extra > summary{ font-size:0.74rem; }
+    .th-maker > summary{ font-size:1rem; }
+    .th-safety{ font-size:0.92rem; line-height:1.65; }
+    .th-newslist li, .wf-newslist li{ font-size:0.9rem; line-height:1.55; }
+  }
+
+
+  /* Third pass: the exact selectors the audit named — the calculator's own
+     field labels and tier table, the news date, and a nav-wrap that was
+     holding the header at 126px on its own. */
+  @media (max-width:560px){
+    .calc-field label{ font-size:0.76rem; letter-spacing:0.8px; }
+    .tier-table th, .tier-table td{ font-size:0.78rem; padding:8px 7px; }
+    .wf-news #wfNewsCount.wf-kv{ font-size:0.74rem; }
+    .nav-wrap{ gap:8px; padding-top:2px; padding-bottom:2px; }
+    .nav-wrap .nav-cta, .nav-wrap .btn{ min-height:42px; }
+  }
+
+
+  @media (max-width:560px){
+    /* one last table still had 10.9px headers — catch every table in the
+       calculator rather than naming classes one at a time */
+    #crafting table th, #crafting table td,
+    #petlevel table th, #petlevel table td{ font-size:0.78rem; padding:8px 7px; }
+  }
+
+
+  @media (max-width:560px){
+    /* Two columns of plan steps worked at the old small type, but with readable
+       text the gem figures break mid-number. One step per row instead. */
+    .plan-steps{ grid-template-columns:1fr; }
+    .plan-steps li .plan-gems{ white-space:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  }
+
 </style>
 <script>
   // Saved theme wins; otherwise follow the system preference.
