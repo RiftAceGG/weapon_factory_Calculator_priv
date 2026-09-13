@@ -248,8 +248,17 @@
 
   .craft-panel{margin-top:34px; background:linear-gradient(165deg, var(--panel) 0%, var(--panel-3) 100%); border:2px solid var(--ink); box-shadow:6px 6px 0 var(--ink); padding:28px;}
   .craft-panel h3{font-family:'Barlow Condensed', sans-serif; text-transform:uppercase; font-weight:700; font-size:1.15rem; margin-bottom:18px;}
-  .base-item{ display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono', monospace; font-size:0.8rem; color:var(--ink-dim); margin-bottom:22px; text-transform:uppercase; letter-spacing:0.5px;}
-  .base-item .swatch{width:16px; height:16px; border:2px solid var(--ink); background:var(--panel-2);}
+  /* what you are crafting: its picture at the target tier's colour */
+  .base-item{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+  .base-item .th-thumb{ width:64px !important; height:64px !important; }
+  .base-item .swatch{ width:64px; height:64px; border:2px solid var(--ink); background:var(--panel-2); }
+  .target-name{ font-family:'Anton', sans-serif; font-size:1.25rem; line-height:1.15; text-transform:uppercase; letter-spacing:0.5px; }
+  .target-tier{ display:block; margin-top:3px; font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--ink-dim); }
+  @media (max-width:560px){
+    .base-item{ gap:11px; }
+    .base-item .th-thumb, .base-item .swatch{ width:54px !important; height:54px !important; }
+    .target-name{ font-size:1.05rem; }
+  }
 
   table.tier-table{width:100%; border-collapse:collapse; font-size:0.9rem; min-width:520px;}
   table.tier-table th{ text-align:left; font-family:'JetBrains Mono', monospace; font-size:0.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--ink-dim); padding:8px 10px; border-bottom:2px solid var(--ink); white-space:nowrap; }
@@ -1148,14 +1157,6 @@
   }
 
 
-  /* Trading button on the home page: styled apart from the calculators
-     because it is the one page where people meet each other. */
-  .btn-trade{
-    background:linear-gradient(135deg, var(--orange), var(--pink));
-    color:#fff; border-color:var(--ink);
-  }
-  .btn-trade:hover{ filter:brightness(1.06); }
-
 
   /* inbox: one row per conversation */
   #thInbox{ display:grid; gap:8px; }
@@ -1194,6 +1195,11 @@
   .hero-signin .th-acct .th-hint{ max-width:34ch; }
   @media (max-width:560px){
     .hero-signin{ margin-top:18px; }
+  }
+
+
+  @media (max-width:560px){
+    .target-tier{ font-size:0.74rem; }
   }
 
 </style>
@@ -1254,7 +1260,7 @@
   <p class="tagline">Craft <b>quintillions</b> of weapons. Sell them for cash. Fight monsters to prove they hit hard.</p>
   <div class="hero-ctas">
     <a class="btn btn-primary" href="https://www.roblox.com/games/108452487199736" target="_blank" rel="noopener">▶ Play on Roblox</a>
-    <a class="btn btn-trade" href="#trading">🤝 Trading Hub</a>
+    <a class="btn btn-ghost" href="#trading">🤝 Trading Hub</a>
   </div>
   <div class="hero-ctas" style="margin-top:16px;">
     <a class="btn btn-ghost" href="#crafting">⚒ Crafting Calculator</a>
@@ -2218,6 +2224,17 @@ for(let i=1;i<=10;i++){
 /* The crafting page shows the same artwork the trading hub uses: the item's
    own bottle or clover on that tier's colour. itemThumbHTML lives further down
    the file, so this is guarded for the first render during setup. */
+function craftItemName(){
+  try{
+    const c = CATEGORIES[state.category];
+    const key = 'i:' + (c.variants ? `${state.category}:${state.variant}` : state.category);
+    const it = TradingHub.ITEM_BY_KEY[key];
+    if(it) return it.label;
+  }catch(e){}
+  const c = CATEGORIES[state.category];
+  return c.variants ? `${state.variant} ${c.label}` : c.label;
+}
+
 function craftArtHTML(tier, size){
   // render() runs during setup, before the TradingHub const exists. Touching a
   // const in its temporal dead zone throws even behind a typeof check, so this
@@ -2470,9 +2487,13 @@ function render(){
   const branch = getBranch();
   const idx = state.targetTier - 1;
 
-  const baseArt = craftArtHTML(1, 34) || '<span class="swatch"></span>';
+  const targetArt = craftArtHTML(state.targetTier, 64);
+  // The plain item name, not baseItemName() — that carries the tier-1 numeral
+  // ("Ascender Speed I"), which contradicts the target tier shown beneath it.
+  const targetName = craftItemName();
   document.getElementById('baseItemLine').innerHTML =
-    `${baseArt} <span>Base item: ${baseItemName()}${(CATEGORIES[state.category].variants && !CATEGORIES[state.category].baseItemByVariant) ? ' · ' + state.variant : ''}</span>`;
+    `${targetArt}<div class="target-name">${targetName}
+       <span class="target-tier">Tier ${state.targetTier} — ${TIER_NAMES[idx]}</span></div>`;
 
   const qty = Math.max(1, parseAbbrev(qtyInput.value) || 1);
   const haveByTier = getHaveByTier();
@@ -4024,6 +4045,7 @@ initPetLevelCalculator();
    tag is optional and can be 'new', 'fixed' or 'changed'.
 ============================================================ */
 const SITE_NEWS = [
+  { date:'7 Sep 2026', tag:'changed', text:'The crafting page now shows a picture of what you are making at your target tier, instead of a base item line.' },
   { date:'7 Sep 2026', tag:'new',     text:'Tokens can now be traded, with proper gem and token icons.' },
   { date:'7 Sep 2026', tag:'changed', text:'Discord sign-in moved to the home page, the offer being discussed shows above each conversation, and the trade form is simpler.' },
   { date:'7 Sep 2026', tag:'fixed', text:'Added a My Messages inbox. Messages sent to you about your own offer were impossible to open before.' },
@@ -4230,7 +4252,7 @@ const TradingHub = (function(){
     { id:'clovers',   label:'Clovers' },
     { id:'artifacts', label:'Artifacts' },
     { id:'bags',      label:'Bags & more' },
-    { id:'currency',  label:'Gems, cash & tokens' }
+    { id:'currency',  label:'Gems & tokens' }
   ];
   const TRADE_ITEMS = [];
   WF.ITEMS.forEach(it => TRADE_ITEMS.push({ key:'i:'+it.key, label:it.name, group:it.catLabel,
@@ -4238,7 +4260,6 @@ const TradingHub = (function(){
   ALL_PETS.forEach(p => TRADE_ITEMS.push({ key:'p:'+p.id, label:p.name, group:'Pets — ' + p.packName,
                                            kind:'cards', tiers:0, rarity:p.rarity }));
   TRADE_ITEMS.push({ key:'x:gems',   label:'Gems',   group:'Other', kind:'currency', tiers:0 });
-  TRADE_ITEMS.push({ key:'x:cash',   label:'Cash',   group:'Other', kind:'currency', tiers:0 });
   TRADE_ITEMS.push({ key:'x:tokens', label:'Tokens', group:'Other', kind:'currency', tiers:0 });
   const ITEM_BY_KEY = Object.fromEntries(TRADE_ITEMS.map(i => [i.key, i]));
   const QUALITY_OPTS = (typeof QUALITIES !== 'undefined') ? QUALITIES : ['Normal'];
