@@ -1738,7 +1738,10 @@ const Account = (function(){
     }
     client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     client.auth.getSession().then(({ data }) => { setUser(data && data.session ? data.session.user : null); });
-    client.auth.onAuthStateChange((_e, session) => { setUser(session ? session.user : null); });
+    client.auth.onAuthStateChange((evt, session) => {
+      setUser(session ? session.user : null);
+      if(evt === 'SIGNED_IN') ensureGuildJoin(session);
+    });
     return client;
   }
   function setUser(u){ user = u; listeners.forEach(fn => { try{ fn(u); }catch(e){} }); }
@@ -1748,10 +1751,33 @@ const Account = (function(){
     if(!client) throw new Error('Supabase is not configured yet');
     // Come back to this exact page after Discord sends the user home.
     const redirectTo = window.location.origin + window.location.pathname;
-    const { error } = await client.auth.signInWithOAuth({ provider:'discord', options:{ redirectTo } });
+    // 'guilds.join' lets the bot add the user to the Weapon Factory server, which
+    // Discord requires before it will let the bot DM them. Listing scopes replaces
+    // the defaults, so identify and email have to stay spelled out here.
+    const { error } = await client.auth.signInWithOAuth({
+      provider:'discord',
+      options:{ redirectTo, scopes:'identify email guilds.join' }
+    });
     if(error) throw error;
   }
   async function signOut(){ if(client) await client.auth.signOut(); }
+
+  /* Discord only returns provider_token in the moment just after sign-in, and it
+     is never persisted across reloads — so this has to run off SIGNED_IN. The
+     edge function holds the bot token and does the actual join; failure here is
+     not fatal, it only means that user won't get Discord DMs. */
+  let guildJoinTried = false;
+  async function ensureGuildJoin(session){
+    if(guildJoinTried || !client || !session || !session.provider_token) return;
+    guildJoinTried = true;
+    try{
+      await client.functions.invoke('discord-join', {
+        body:{ provider_token: session.provider_token }
+      });
+    }catch(e){
+      console.warn('Discord server join skipped:', e);
+    }
+  }
 
   // Discord hands back a few name fields depending on the account age.
   function profile(){
