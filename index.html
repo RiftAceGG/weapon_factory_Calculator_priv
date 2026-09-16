@@ -1046,6 +1046,8 @@
 
 
   .wpn-variants{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
+  .wpn-shiny-note{ margin:-4px 0 14px; padding:8px 12px; border:2px solid #c9a227; border-radius:8px; background:linear-gradient(90deg,#fff6d6,#fdeaff); color:#5a4300; font-size:0.9rem; }
+  .wpn-shiny-note b{ color:#8a5a00; }
   @media (max-width:560px){
     .wpn-variants{ gap:6px; }
     .wpn-variants .craft-tab{ flex:1 1 auto; }
@@ -1552,11 +1554,12 @@
   </div>
 
   <div id="idxWeapons" hidden>
-    <p class="lede">All 20 weapon types from the game’s index. Tap a type to see its weapons, or search by name. Switch to Shiny for the shiny stats and odds — shinies roll 100× rarer than the normal variant.</p>
+    <p class="lede">All 20 weapon types from the game’s index. Tap a type to see its weapons, or search by name. Switch to Shiny for the shiny stats and odds — shinies roll 100× rarer than the normal variant, and 1,000× rarer for Specials, Secrets and the Harpoons.</p>
     <div class="wpn-variants" id="wpnVariants">
       <button type="button" class="craft-tab active" data-var="Normal">Normal</button>
-      <button type="button" class="craft-tab" data-var="Shiny">Shiny ×1.5</button>
+      <button type="button" class="craft-tab" data-var="Shiny">Shiny 1.5x Stats</button>
     </div>
+    <p class="wpn-shiny-note" id="wpnShinyNote" hidden>✨ Showing <b>Shiny</b> stats — Value, DMG, Exp, HP and Luck are ×1.5, and attacks are 1.5× faster.</p>
     <div class="th-field">
       <label for="wpnSearch">Search weapons</label>
       <input type="text" id="wpnSearch" placeholder="Type a weapon name…" autocomplete="off">
@@ -3541,9 +3544,7 @@ function packSearchText(i, info){
 }
 
 let packQuery = '';
-// Packs stay hidden until something is searched for. "Show all" is the escape
-// hatch for browsing, and it resets the moment a new search is typed.
-let packShowAll = false;
+// Every pack shows by default; typing a search narrows the grid.
 
 function buildPackGrid(){
   const grid = document.getElementById('packGrid');
@@ -3552,22 +3553,6 @@ function buildPackGrid(){
   const q = packQuery.trim().toLowerCase();
   const countEl = document.getElementById('packSearchCount');
   const clearBtn = document.getElementById('packSearchClear');
-
-  if(!q && !packShowAll){
-    const prompt = document.createElement('div');
-    prompt.className = 'pack-prompt';
-    prompt.innerHTML = `
-      <p><b>Search for a pack to open it.</b></p>
-      <p>Type a pack name, a cost, or the pet you're after — "hydra" finds the pack that drops it.</p>
-      <button type="button" class="btn-util" id="packShowAllBtn">Show all ${PACK_COUNT} packs</button>
-    `;
-    grid.appendChild(prompt);
-    const showBtn = prompt.querySelector('#packShowAllBtn');
-    showBtn.addEventListener('click', () => { packShowAll = true; buildPackGrid(); });
-    if(countEl) countEl.textContent = '';
-    if(clearBtn) clearBtn.hidden = true;
-    return;
-  }
 
   let shown = 0;
   for(let i=1;i<=PACK_COUNT;i++){
@@ -3611,7 +3596,7 @@ function buildPackGrid(){
       ? `${shown} of ${PACK_COUNT} packs match "${packQuery.trim()}"`
       : `Showing all ${shown} packs`;
   }
-  if(clearBtn) clearBtn.hidden = !q && !packShowAll;
+  if(clearBtn) clearBtn.hidden = !q;
 }
 
 function wirePackSearch(){
@@ -3620,7 +3605,6 @@ function wirePackSearch(){
   if(!input) return;
   input.addEventListener('input', () => {
     packQuery = input.value;
-    if(packQuery.trim()) packShowAll = false;
     buildPackGrid();
     // Keep the open pack highlighted if it survived the filter.
     if(openPackNum && document.getElementById(`packCard${openPackNum}`)){
@@ -3628,7 +3612,7 @@ function wirePackSearch(){
     }
   });
   if(clearBtn) clearBtn.addEventListener('click', () => {
-    input.value = ''; packQuery = ''; packShowAll = false;
+    input.value = ''; packQuery = '';
     buildPackGrid(); input.focus();
   });
 }
@@ -4709,37 +4693,37 @@ const WEAPON_CATEGORIES = [
       stats:{ Value:"80x", DMG:"55x", "Atk Spd":"1s", Exp:"80x", HP:"55x", Luck:"13x" } }
   ] },
   { name:"Specials",    total:7,  colour:"#f03a3a", weapons:[
-    { name:"Dragon Slayer",            icon:"dragon-slayer", odds:"1 in 100k",
+    { name:"Dragon Slayer",            icon:"dragon-slayer", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"40x", DMG:"60x", "Atk Spd":"2.8s", Exp:"40x", HP:"60x", Luck:"10x" } },
-    { name:"Excalibur",                icon:"excalibur", odds:"1 in 100k",
+    { name:"Excalibur",                icon:"excalibur", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"50x", DMG:"35x", "Atk Spd":"2s", Exp:"50x", HP:"30x", Luck:"10x" } },
-    { name:"Dark Repulser",            icon:"dark-repulser", odds:"1 in 100k",
+    { name:"Dark Repulser",            icon:"dark-repulser", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"40x", DMG:"40x", "Atk Spd":"1.5s", Exp:"40x", HP:"40x", Luck:"10x" } },
-    { name:"Elucidator",               icon:"elucidator", odds:"1 in 100k",
+    { name:"Elucidator",               icon:"elucidator", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"40x", DMG:"40x", "Atk Spd":"1.5s", Exp:"40x", HP:"40x", Luck:"10x" } },
-    { name:"Chocolate Sword",          icon:"chocolate-sword", odds:"1 in 100k",
+    { name:"Chocolate Sword",          icon:"chocolate-sword", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"35x", DMG:"30x", "Atk Spd":"2s", Exp:"35x", HP:"30x", Luck:"10x" } },
-    { name:"The Hollow Constellation", icon:"the-hollow-constellation", odds:"1 in 100k",
+    { name:"The Hollow Constellation", icon:"the-hollow-constellation", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"35x", DMG:"45x", "Atk Spd":"2.2s", Exp:"35x", HP:"45x", Luck:"10x" } },
-    { name:"Black Death Scythe",       icon:"black-death-scythe", odds:"1 in 100k",
+    { name:"Black Death Scythe",       icon:"black-death-scythe", odds:"1 in 100k", shinyOdds:"1 in 100M",
       stats:{ Value:"30x", DMG:"40x", "Atk Spd":"1.6s", Exp:"30x", HP:"40x", Luck:"10x" } }
   ] },
   { name:"Secrets",     total:8,  colour:"#2b2b2b", weapons:[
-    { name:"Ancient Battle Axe", icon:"ancient-battle-axe", odds:"1 in 1M",
+    { name:"Ancient Battle Axe", icon:"ancient-battle-axe", odds:"1 in 1M", shinyOdds:"1 in 1B",
       stats:{ Value:"110x", DMG:"150x", "Atk Spd":"3s", Exp:"110x", HP:"140x", Luck:"15x" } },
-    { name:"Hexed Dagger",       icon:"hexed-dagger", odds:"1 in 2M",
+    { name:"Hexed Dagger",       icon:"hexed-dagger", odds:"1 in 2M", shinyOdds:"1 in 2B",
       stats:{ Value:"130x", DMG:"70x", "Atk Spd":"1s", Exp:"130x", HP:"70x", Luck:"17x" } },
-    { name:"Black Hole Blade",   icon:"black-hole-blade", odds:"1 in 5M",
+    { name:"Black Hole Blade",   icon:"black-hole-blade", odds:"1 in 5M", shinyOdds:"1 in 5B",
       stats:{ Value:"180x", DMG:"130x", "Atk Spd":"1.5s", Exp:"180x", HP:"130x", Luck:"20x" } },
-    { name:"Blue Abyss Katana",  icon:"blue-abyss-katana", odds:"1 in 10M",
+    { name:"Blue Abyss Katana",  icon:"blue-abyss-katana", odds:"1 in 10M", shinyOdds:"1 in 10B",
       stats:{ Value:"220x", DMG:"190x", "Atk Spd":"1.2s", Exp:"220x", HP:"190x", Luck:"25x" } },
-    { name:"Dragon Eye Knife",   icon:"dragon-eye-knife", odds:"1 in 20M",
+    { name:"Dragon Eye Knife",   icon:"dragon-eye-knife", odds:"1 in 20M", shinyOdds:"1 in 20B",
       stats:{ Value:"280x", DMG:"200x", "Atk Spd":"0.9s", Exp:"280x", HP:"200x", Luck:"30x" } },
-    { name:"Soul Whip",          icon:"soul-whip", odds:"1 in 30M",
+    { name:"Soul Whip",          icon:"soul-whip", odds:"1 in 30M", shinyOdds:"1 in 30B",
       stats:{ Value:"340x", DMG:"220x", "Atk Spd":"0.8s", Exp:"340x", HP:"220x", Luck:"35x" } },
-    { name:"Nightmare Scythe",   icon:"nightmare-scythe", odds:"1 in 50M",
+    { name:"Nightmare Scythe",   icon:"nightmare-scythe", odds:"1 in 50M", shinyOdds:"1 in 50B",
       stats:{ Value:"400x", DMG:"300x", "Atk Spd":"1.3s", Exp:"400x", HP:"300x", Luck:"45x" } },
-    { name:"The King's Blade",   icon:"the-kings-blade", odds:"1 in 100M",
+    { name:"The King's Blade",   icon:"the-kings-blade", odds:"1 in 100M", shinyOdds:"1 in 100B",
       stats:{ Value:"700x", DMG:"500x", "Atk Spd":"0.9s", Exp:"700x", HP:"500x", Luck:"100x" } }
   ] },
   { name:"Exclusives",  total:22, colour:"#9b32ec", weapons:[
@@ -4830,10 +4814,10 @@ const WEAPON_CATEGORIES = [
     { name:"Coconut Sword", icon:"coconut-sword",
       stats:{ Value:"85x", DMG:"60x", "Atk Spd":"2s", Exp:"85x", HP:"60x", Luck:"8x" },
       note:"Limited Weapon" },
-    { name:"Harpoon", icon:"harpoon",
+    { name:"Harpoon", icon:"harpoon", odds:"1 in 200k", shinyOdds:"1 in 200M",
       stats:{ Value:"80x", DMG:"60x", "Atk Spd":"1.5s", Exp:"80x", HP:"60x", Luck:"10x" },
       note:"Limited Weapon" },
-    { name:"Leviathan Harpoon", icon:"leviathan-harpoon", odds:"1 in 2M",
+    { name:"Leviathan Harpoon", icon:"leviathan-harpoon", odds:"1 in 2M", shinyOdds:"1 in 2B",
       stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.2s", Exp:"150x", HP:"120x", Luck:"15x" } }
   ] }
 ];
@@ -5686,11 +5670,15 @@ function itemThumbHTML(line, size){
     return s + '%';
   }
 
-  function weaponShinyOdds(odds){
+  /* Shiny odds default to 100x the normal odds. A weapon can set its own
+     shinyOdds when the game uses a different rate (e.g. Secrets are 1000x). */
+  function weaponShinyOdds(odds, override){
     const d = weaponOddsDenom(odds);
-    if(d === null) return null;
-    const shinyDenom = d * SHINY_ODDS_MULT;
-    return { odds: '1 in ' + fmtWeaponOdds(shinyDenom), chance: fmtWeaponChance(shinyDenom) };
+    const o = weaponOddsDenom(override);
+    const shinyDenom = o !== null ? o : (d !== null ? d * SHINY_ODDS_MULT : null);
+    if(shinyDenom === null) return null;
+    const mult = d ? Math.round(shinyDenom / d) : null;
+    return { odds: '1 in ' + fmtWeaponOdds(shinyDenom), chance: fmtWeaponChance(shinyDenom), mult };
   }
 
   function weaponRows(cat){
@@ -5710,7 +5698,7 @@ function itemThumbHTML(line, size){
          carries the prefix and the badge shows the shiny odds, so the extra
          shiny line only appears here — not on every normal card. */
       const isShiny = variant === 'Shiny';
-      const shiny = isShiny ? weaponShinyOdds(w.odds) : null;
+      const shiny = isShiny ? weaponShinyOdds(w.odds, w.shinyOdds) : null;
       const badge = isShiny ? (shiny && shiny.odds) : w.odds;
       return `<div class="wpn-card">
         <div class="wpn-top">
@@ -5719,7 +5707,7 @@ function itemThumbHTML(line, size){
           ${badge ? `<span class="wpn-odds">${esc(badge)}</span>` : ''}
         </div>
         ${rows ? `<div class="wpn-stats">${rows}</div>` : ''}
-        ${shiny ? `<div class="wpn-shiny"><span class="wpn-shiny-k">Shiny chance \u00b7 100\u00d7 rarer</span><span class="wpn-shiny-v">${esc(shiny.chance)}</span><span class="wpn-shiny-pct">normal ${esc(w.odds)}</span></div>` : ''}
+        ${shiny ? `<div class="wpn-shiny"><span class="wpn-shiny-k">Shiny chance${shiny.mult ? ` \u00b7 ${shiny.mult.toLocaleString()}\u00d7 rarer` : ''}</span><span class="wpn-shiny-v">${esc(shiny.chance)}</span>${w.odds ? `<span class="wpn-shiny-pct">normal ${esc(w.odds)}</span>` : ''}</div>` : ''}
         ${w.note ? `<div class="wpn-note">${esc(w.note)}</div>` : ''}
       </div>`;
     }).join('') + openSlots(cat);
@@ -5761,6 +5749,8 @@ function itemThumbHTML(line, size){
   if(vars) vars.querySelectorAll('[data-var]').forEach(b => b.addEventListener('click', () => {
     variant = b.dataset.var;
     vars.querySelectorAll('[data-var]').forEach(x => x.classList.toggle('active', x===b));
+    const note = $('wpnShinyNote');
+    if(note) note.hidden = variant !== 'Shiny';
     render();
   }));
   render();
