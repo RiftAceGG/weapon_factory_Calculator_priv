@@ -1552,7 +1552,7 @@
   </div>
 
   <div id="idxWeapons" hidden>
-    <p class="lede">All 20 weapon types from the game’s index. Tap a type to see its weapons, or search by name. Each weapon shows its drop odds, plus the shiny odds — shinies roll 100× rarer than the normal variant.</p>
+    <p class="lede">All 20 weapon types from the game’s index. Tap a type to see its weapons, or search by name. Switch to Shiny for the shiny stats and odds — shinies roll 100× rarer than the normal variant.</p>
     <div class="wpn-variants" id="wpnVariants">
       <button type="button" class="craft-tab active" data-var="Normal">Normal</button>
       <button type="button" class="craft-tab" data-var="Shiny">Shiny ×1.5</button>
@@ -3325,7 +3325,7 @@ PACK_DATA[18] = {
     { name:"Wendigo",              rarity:"Secret",    moneyMult:95400,  expMult:95400, gemsMult:91, oddsDenom:2000000000,  hotspot:{left:40.67, top:67.02, width:18.65, height:31.51} },
     // 250% base, confirmed in game. The quality ladder is the usual +10 points
     // per step.
-    { name:"Gashadokuro",          rarity:"Eternal",   luckMult:3, bestCardPctByQuality:{Normal:250, Golden:260, Shiny:270, Rainbow:280, Void:290}, oddsDenom:500000000000, hotspot:{left:60.39, top:67.02, width:18.65, height:31.51} }
+    { name:"Gashadokuro",          rarity:"Eternal",   luckMult:3, bestCardPctByQuality:{Normal:200, Golden:210, Shiny:220, Rainbow:230, Void:240}, oddsDenom:500000000000, hotspot:{left:60.39, top:67.02, width:18.65, height:31.51} }
   ]
 };
 
@@ -3449,7 +3449,7 @@ PACK_DATA[28] = {
   fullImage: EXCLUSIVE_FULL_IMAGE,
   cards: [
     { name:"Blue Phoenix",        rarity:"Exclusive", moneyMult:3500, expMult:3500, gemsMult:7, oddsLabel:"Forever Pack",                          hotspot:{left:11.10, top:2.19, width:18.65, height:46.88} },
-    { name:"Blue Flame",          rarity:"Exclusive", bestCardPctByQuality:{Normal:150, Golden:160, Shiny:170, Rainbow:180, Void:190}, oddsLabel:"Forever Pack",                          hotspot:{left:30.82, top:2.19, width:18.65, height:46.88} },
+    { name:"Blue Flame",          rarity:"Exclusive", luckMult:2, bestCardPctByQuality:{Normal:150, Golden:160, Shiny:170, Rainbow:180, Void:190}, oddsLabel:"Forever Pack",                          hotspot:{left:30.82, top:2.19, width:18.65, height:46.88} },
     { name:"Blue Black Hole",     rarity:"Exclusive", moneyMult:2500, expMult:2500, gemsMult:5, oddsLabel:"Season 1 Weapon Pass",                  hotspot:{left:50.53, top:2.19, width:18.65, height:46.88} },
     { name:"Eternal Black Hole",  rarity:"Exclusive", luckMult:2, bestCardPctByQuality:{Normal:150, Golden:160, Shiny:170, Rainbow:180, Void:190}, oddsLabel:"Eternal Abyss Pack",                    hotspot:{left:70.25, top:2.19, width:18.65, height:46.88} },
     { name:"Sword Plushy",        rarity:"Exclusive", bestCardPctByQuality:{Normal:50, Golden:60, Shiny:70, Rainbow:80, Void:90}, oddsLabel:"Achievements",                          hotspot:{left:20.96, top:50.94, width:18.65, height:46.88} },
@@ -4745,70 +4745,70 @@ const WEAPON_CATEGORIES = [
   { name:"Exclusives",  total:22, colour:"#9b32ec", weapons:[
     { name:"Gem Blade", icon:"gem-blade",
       stats:{ Value:"60x", DMG:"40x", "Atk Spd":"2s", Exp:"60x", HP:"40x", Luck:"12x" },
-      note:"Exclusive Weapon \u00b7 140 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Linked Sword", icon:"linked-sword",
       stats:{ Value:"35x", DMG:"25x", "Atk Spd":"2.5s", Exp:"35x", HP:"25x", Luck:"3x" },
-      note:"Robux Crate Weapon \u00b7 513 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Token Blade", icon:"token-blade",
       stats:{ Value:"120x", DMG:"80x", "Atk Spd":"1.5s", Exp:"120x", HP:"80x", Luck:"20x" },
-      note:"Exclusive Weapon \u00b7 42 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Venomshank", icon:"venomshank",
       stats:{ Value:"55x", DMG:"40x", "Atk Spd":"2s", Exp:"55x", HP:"40x", Luck:"4.5x" },
-      note:"Robux Crate Weapon \u00b7 201 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Balloon Sword", icon:"balloon-sword",
       stats:{ Value:"80x", DMG:"50x", "Atk Spd":"2s", Exp:"80x", HP:"50x", Luck:"10x" },
-      note:"Exclusive Weapon \u00b7 127 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Icedagger", icon:"icedagger",
       stats:{ Value:"90x", DMG:"60x", "Atk Spd":"1.2s", Exp:"90x", HP:"60x", Luck:"7x" },
-      note:"Robux Crate Weapon \u00b7 77 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Summer Scythe", icon:"summer-scythe",
       stats:{ Value:"80x", DMG:"50x", "Atk Spd":"2s", Exp:"80x", HP:"50x", Luck:"10x" },
-      note:"Exclusive Weapon \u00b7 18 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Firebrand", icon:"firebrand",
       stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.5s", Exp:"150x", HP:"120x", Luck:"10x" },
-      note:"Robux Crate Weapon \u00b7 50 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Lightning Blade", icon:"lightning-blade",
       stats:{ Value:"50x", DMG:"40x", "Atk Spd":"1.8s", Exp:"45x", HP:"35x", Luck:"7x" },
-      note:"Exclusive Weapon \u00b7 20 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Darkheart", icon:"darkheart",
       stats:{ Value:"270x", DMG:"220x", "Atk Spd":"1s", Exp:"270x", HP:"220x", Luck:"20x" },
-      note:"Robux Crate Weapon \u00b7 130 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Shattered Katana", icon:"shattered-katana",
       stats:{ Value:"90x", DMG:"85x", "Atk Spd":"1.7s", Exp:"80x", HP:"70x", Luck:"14x" },
-      note:"Exclusive Weapon \u00b7 44 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Bling Dagger", icon:"bling-dagger",
       stats:{ Value:"35x", DMG:"25x", "Atk Spd":"1.5s", Exp:"35x", HP:"25x", Luck:"3x" },
-      note:"Robux Crate Weapon \u00b7 733 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Owner's Sword", icon:"owners-sword",
       stats:{ Value:"100x", DMG:"80x", "Atk Spd":"1.2s", Exp:"100x", HP:"80x", Luck:"10x" },
-      note:"Exclusive Weapon \u00b7 20 globally created" },
+      note:"Exclusive Weapon" },
     { name:"Bling Sword", icon:"bling-sword",
       stats:{ Value:"55x", DMG:"40x", "Atk Spd":"1.6s", Exp:"55x", HP:"40x", Luck:"4.5x" },
-      note:"Robux Crate Weapon \u00b7 237 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Bling Katana", icon:"bling-katana",
       stats:{ Value:"90x", DMG:"60x", "Atk Spd":"1.2s", Exp:"90x", HP:"60x", Luck:"7x" },
-      note:"Robux Crate Weapon \u00b7 75 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Bling Scythe", icon:"bling-scythe",
       stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.5s", Exp:"150x", HP:"120x", Luck:"10x" },
-      note:"Robux Crate Weapon \u00b7 39 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Royal Great Sword", icon:"royal-great-sword",
       stats:{ Value:"270x", DMG:"300x", "Atk Spd":"2s", Exp:"270x", HP:"300x", Luck:"20x" },
-      note:"Robux Crate Weapon \u00b7 23 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Vanilla Ice Cream Sword", icon:"vanilla-ice-cream-sword",
       stats:{ Value:"35x", DMG:"25x", "Atk Spd":"1.6s", Exp:"35x", HP:"25x", Luck:"4x" },
-      note:"Robux Crate Weapon \u00b7 455 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Chocolate Ice Cream Sword", icon:"chocolate-ice-cream-sword",
       stats:{ Value:"55x", DMG:"40x", "Atk Spd":"1.5s", Exp:"55x", HP:"40x", Luck:"5x" },
-      note:"Robux Crate Weapon \u00b7 172 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Strawberry Ice Cream Sword", icon:"strawberry-ice-cream-sword",
       stats:{ Value:"90x", DMG:"60x", "Atk Spd":"1.4s", Exp:"90x", HP:"60x", Luck:"7x" },
-      note:"Robux Crate Weapon \u00b7 38 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Mint Ice Cream Sword", icon:"mint-ice-cream-sword",
       stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.3s", Exp:"150x", HP:"120x", Luck:"10x" },
-      note:"Robux Crate Weapon \u00b7 25 globally created" },
+      note:"Robux Crate Weapon" },
     { name:"Cookie Ice Cream Sword", icon:"cookie-ice-cream-sword",
       stats:{ Value:"270x", DMG:"250x", "Atk Spd":"1.2s", Exp:"270x", HP:"250x", Luck:"20x" },
-      note:"Robux Crate Weapon \u00b7 17 globally created" }
+      note:"Robux Crate Weapon" }
   ] },
   { name:"Dungeon",     total:4,  colour:"#3fc23a", weapons:[
     { name:"Zombie Sword",           icon:"zombie-sword",
@@ -4823,19 +4823,18 @@ const WEAPON_CATEGORIES = [
   { name:"Limited",     total:5,  colour:"#f03a3a", weapons:[
     { name:"Release Sword", icon:"release-sword",
       stats:{ Value:"80x", DMG:"60x", "Atk Spd":"2s", Exp:"80x", HP:"50x", Luck:"8x" },
-      note:"Limited Weapon \u00b7 673 globally created" },
+      note:"Limited Weapon" },
     { name:"Driftwood Sword", icon:"driftwood-sword",
       stats:{ Value:"50x", DMG:"40x", "Atk Spd":"2.5s", Exp:"50x", HP:"40x", Luck:"4x" },
-      note:"Limited Weapon \u00b7 1,582 globally created" },
+      note:"Limited Weapon" },
     { name:"Coconut Sword", icon:"coconut-sword",
       stats:{ Value:"85x", DMG:"60x", "Atk Spd":"2s", Exp:"85x", HP:"60x", Luck:"8x" },
-      note:"Limited Weapon \u00b7 801 globally created" },
+      note:"Limited Weapon" },
     { name:"Harpoon", icon:"harpoon",
       stats:{ Value:"80x", DMG:"60x", "Atk Spd":"1.5s", Exp:"80x", HP:"60x", Luck:"10x" },
       note:"Limited Weapon" },
     { name:"Leviathan Harpoon", icon:"leviathan-harpoon", odds:"1 in 2M",
-      stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.2s", Exp:"150x", HP:"120x", Luck:"15x" },
-      note:"122 globally created" }
+      stats:{ Value:"150x", DMG:"120x", "Atk Spd":"1.2s", Exp:"150x", HP:"120x", Luck:"15x" } }
   ] }
 ];
 
@@ -5707,15 +5706,20 @@ function itemThumbHTML(line, size){
       const src = w.icon
         ? ((typeof WEAPON_ART_DATA !== 'undefined' && WEAPON_ART_DATA[w.icon]) || ('img/wpn-' + w.icon + '.webp'))
         : null;
-      const shiny = weaponShinyOdds(w.odds);
+      /* In Shiny mode the card describes the shiny weapon outright: the name
+         carries the prefix and the badge shows the shiny odds, so the extra
+         shiny line only appears here — not on every normal card. */
+      const isShiny = variant === 'Shiny';
+      const shiny = isShiny ? weaponShinyOdds(w.odds) : null;
+      const badge = isShiny ? (shiny && shiny.odds) : w.odds;
       return `<div class="wpn-card">
         <div class="wpn-top">
           ${src ? `<img class="wpn-icon" src="${esc(src)}" alt="">` : ''}
-          <span class="wpn-name">${esc(w.name)}</span>
-          ${w.odds ? `<span class="wpn-odds">${esc(w.odds)}</span>` : ''}
+          <span class="wpn-name">${isShiny ? 'Shiny ' : ''}${esc(w.name)}</span>
+          ${badge ? `<span class="wpn-odds">${esc(badge)}</span>` : ''}
         </div>
         ${rows ? `<div class="wpn-stats">${rows}</div>` : ''}
-        ${shiny ? `<div class="wpn-shiny"><span class="wpn-shiny-k">Shiny \u00b7 100\u00d7 rarer</span><span class="wpn-shiny-v">${esc(shiny.odds)}</span><span class="wpn-shiny-pct">${esc(shiny.chance)} chance</span></div>` : ''}
+        ${shiny ? `<div class="wpn-shiny"><span class="wpn-shiny-k">Shiny chance \u00b7 100\u00d7 rarer</span><span class="wpn-shiny-v">${esc(shiny.chance)}</span><span class="wpn-shiny-pct">normal ${esc(w.odds)}</span></div>` : ''}
         ${w.note ? `<div class="wpn-note">${esc(w.note)}</div>` : ''}
       </div>`;
     }).join('') + openSlots(cat);
